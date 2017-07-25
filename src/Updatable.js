@@ -1,86 +1,111 @@
 // @flow
 
-export type Status = {
-  failure: boolean,
-  pending: boolean,
-  success: boolean,
-};
 type Listener = () => void;
 type Callable = Updater|Listener;
-type UpdaterCallable<Item: Callable> = {
-  add: (item: Item: Callable) => Updater,
-  remove: (item: Item: Callable) => Updater,
+type ModifiableCollection<Item: Callable> = {
+  add: (item: Item) => Callable,
+  remove: (item: Item) => Callable,
 };
 
 class UpdateKey {}
 
-export class Updater {
-  listeners: UpdaterCallable<Listener> = {
-    add: this._add.bind(this, this._listeners),
-    remove: this._remove.bind(this, this._listeners),
-  };
-  parents: UpdaterCallable<Updater> = {
-    add: this._add.bind(this, this._parents),
-    remove: this._remove.bind(this, this._parents),
-  };
-  status: Status = {
+type StatusState = {
+  failure: boolean,
+  pending: boolean,
+  success: boolean,
+};
+
+export class Status {
+  _state: StatusState = {
     failure: false,
     pending: false,
     success: false,
   };
 
-  _isActive: boolean = true;
+  constructor(state: StatusState) {
+    this._state = state;
+  }
+
+  get failure(): boolean {
+    return this._state.failure;
+  }
+
+  get pending(): boolean {
+    return this._state.pending;
+  }
+
+  get success(): boolean {
+    return this._state.success;
+  }
+}
+
+export class Updater {
+  listeners: ModifiableCollection<Listener> = this._modifiableCollection(this._listeners);
+  parents: ModifiableCollection<Updater> = this._modifiableCollection(this._parents);
+  _status: Status = new Status({
+    failure: false,
+    pending: false,
+    success: false,
+  });
+
   _listeners: Array<Listener> = [];
   _parents: Array<Updater> = [];
   _updateKey: UpdateKey = new UpdateKey;
 
-  isActive(updateKey: UpdateKey): boolean {
-    return this._isActive;
+  get status(): Status {
+    return this._status;
   }
 
   setFailure(updateKey: UpdateKey): Updater {
-    this.status = {
+    this._status = new Status({
       failure: true,
       pending: false,
       success: false,
-    };
+    });
 
-    return this._forEachParent(parent: Updater): void => {
+    return this._forEachParent((parent: Updater): void => {
       parent.setFailure(this._updateKey);
     });
   }
 
   setPending(updateKey: UpdateKey): Updater {
-    this.status = {
+    this._status = new Status({
       failure: false,
       pending: true,
       success: false,
-    };
+    });
 
-    return this._forEachParent(parent: Updater): void => {
+    return this._forEachParent((parent: Updater): void => {
       parent.setPending(this._updateKey);
     });
   }
 
   setSuccess(updateKey: UpdateKey): Updater {
-    this.status = {
+    this._status = new Status({
       failure: false,
       pending: false,
       success: true,
-    };
+    });
 
-    return this._forEachParent(parent: Updater): void => {
+    return this._forEachParent((parent: Updater): void => {
       parent.setSuccess(this._updateKey);
     });
   }
 
-  _add<Item: Callable>(collection: Array<Item>, item: Item): Updater {
+  _modifiableCollection<Item: Callable>(collection: Array<Item>): ModifiableCollection<Item> {
+    return {
+      add: this._addToCollection.bind(this, collection),
+      remove: this._removeFromCollection.bind(this, collection),
+    };
+  }
+
+  _addToCollection<Item: Callable>(collection: Array<Item>, item: Item): Updater {
     collection.push(item);
 
     return this;
   }
 
-  _remove<Item: Callable>(collection: Array<Item>, item: Item): Updater {
+  _removeFromCollection<Item: Callable>(collection: Array<Item>, item: Item): Updater {
     var index: number = collection.indexOf(item);
 
     if (index >= 0) {
@@ -91,12 +116,25 @@ export class Updater {
   }
 
   _forEachParent(method: (parent: Updater) => void): Updater {
-    this._parents.forEach(this._updateKey, (parent: Updater): void => {
+    this._parents.forEach((parent: Updater): void => {
       method(parent);
     });
 
-    this._listeners.forEach(this._updateKey, (listener: Listener): void => listener());
+    this._listeners.forEach((listener: Listener): void => listener());
 
     return this;
   }
 }
+
+// Updater.listeners.add
+// Updater.listeners.remove
+//
+// Updater.parents.add
+// Updater.parents.remove
+//
+// Updater.isFailure
+// Updater.childIsFailure
+// Updater.isPending
+// Updater.childIsPending
+// Updater.isSuccess
+// Updater.childIsSuccess
