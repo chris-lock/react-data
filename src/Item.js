@@ -1,5 +1,8 @@
 // @flow
 
-class Item<Data> {
+import Updatable from 'Updatable';
+
+export default class Item
+extends Updatable {
 
 }
