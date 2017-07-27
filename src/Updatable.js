@@ -9,7 +9,7 @@ class UpdateKey {}
 
 export default class Updatable {
   _listeners: Array<Listener> = [];
-  listeners: NonIterable<Listener> = new NonIterable(this._listerners);
+  listeners: NonIterable<Listener> = new NonIterable(this._listeners);
   _parents: Array<Updatable> = [];
   parents: NonIterable<Updatable> = new NonIterable(this._parents);
   _status: UpdateStatus = new UpdateStatus;
