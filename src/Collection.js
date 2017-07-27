@@ -1,10 +1,29 @@
 // @flow
 
+import Record from 'Record';
 import Updatable from 'Updatable';
 
-export default class Collection
-extends Updatable {
+import type {
+  RecordData,
+} from 'Record';
 
+export default class Collection<Data: RecordData, Item: Record<Data>>
+extends Updatable {
+  _dataClass: Class<Item> = Data;
+
+  add(data: Data): void {
+    this._addItem(data);
+  }
+
+  _addItem(data: Data): Item {
+    var item: Item = new this._dataClass(data);
+
+    // this._items[collectionType].push(
+    //   this._addAsParent(item)
+    // );
+
+    return item;
+  }
 }
 
 

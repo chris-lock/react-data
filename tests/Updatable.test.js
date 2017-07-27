@@ -15,7 +15,7 @@ describe('Updatable', () => {
     });
   });
 
-  describe('isFailure', () => {
+  describe('#isFailure', () => {
     it('updates status', () => {
       updatable.isFailure(updatable._updateKey);
 
@@ -28,7 +28,7 @@ describe('Updatable', () => {
     });
   });
 
-  describe('isPending', () => {
+  describe('#isPending', () => {
     it('updates status', () => {
       updatable.isPending(updatable._updateKey);
 
@@ -41,7 +41,7 @@ describe('Updatable', () => {
     });
   });
 
-  describe('isSuccess', () => {
+  describe('#isSuccess', () => {
     it('updates status', () => {
       updatable.isSuccess(updatable._updateKey);
 
@@ -105,7 +105,7 @@ describe('Updatable', () => {
       updatable.parents.add(updatableParent);
     });
 
-    describe('isFailure', () => {
+    describe('#isFailure', () => {
       it('updates all ancestors children status', () => {
         updatable.isFailure(updatable._updateKey);
 
@@ -124,7 +124,7 @@ describe('Updatable', () => {
       });
     });
 
-    describe('isPending', () => {
+    describe('#isPending', () => {
       it('updates all ancestors children status', () => {
         updatable.isPending(updatable._updateKey);
 
@@ -143,7 +143,7 @@ describe('Updatable', () => {
       });
     });
 
-    describe('isSuccess', () => {
+    describe('#isSuccess', () => {
       it('updates all ancestors children status', () => {
         updatable.isSuccess(updatable._updateKey);
 
