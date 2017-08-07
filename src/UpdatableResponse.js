@@ -1,18 +1,18 @@
 // @flow
 
-export default class ResponseState {
-  static failure(): FailureResponseState {
-    return new FailureResponseState;
+export default class UpdatableResponse {
+  static failure(): FailureUpdatableResponse {
+    return new FailureUpdatableResponse;
   }
 
 
-  static pending(): PendingResponseState {
-    return new PendingResponseState;
+  static pending(): PendingUpdatableResponse {
+    return new PendingUpdatableResponse;
   }
 
 
-  static success(): SuccessResponseState {
-    return new SuccessResponseState;
+  static success(): SuccessUpdatableResponse {
+    return new SuccessUpdatableResponse;
   }
 
   _occurance: number = this._now();
@@ -41,22 +41,22 @@ export default class ResponseState {
   }
 }
 
-class FailureResponseState
-extends ResponseState {
+class FailureUpdatableResponse
+extends UpdatableResponse {
   failure(windowInMillseconds?: number): boolean {
     return this.occuredInWindow(windowInMillseconds);
   }
 }
 
-class PendingResponseState
-extends ResponseState {
+class PendingUpdatableResponse
+extends UpdatableResponse {
   pending(windowInMillseconds?: number): boolean {
     return this.occuredInWindow(windowInMillseconds);
   }
 }
 
-class SuccessResponseState
-extends ResponseState {
+class SuccessUpdatableResponse
+extends UpdatableResponse {
   success(windowInMillseconds?: number): boolean {
     return this.occuredInWindow(windowInMillseconds);
   }

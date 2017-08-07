@@ -1,6 +1,6 @@
-import ResponseState from 'ResponseState';
+import UpdatableResponse from 'UpdatableResponse';
 
-describe('ResponseState', () => {
+describe('UpdatableResponse', () => {
   var now = Date.now(),
       responseState;
 
@@ -22,7 +22,7 @@ describe('ResponseState', () => {
 
   beforeEach(() => {
     spyOn(Date, 'now').and.callFake(() => now);
-    responseState = new ResponseState;
+    responseState = new UpdatableResponse;
   });
 
   describe('#failure', () => {
@@ -46,81 +46,81 @@ describe('ResponseState', () => {
     });
   });
 
-  describe('FailureResponseState', () => {
-    var failureResponseState;
+  describe('FailureUpdatableResponse', () => {
+    var failureUpdatableResponse;
 
     beforeEach(() => {
-      failureResponseState = ResponseState.failure();
+      failureUpdatableResponse = UpdatableResponse.failure();
     });
 
     describe('#failure',
-      itImplmentsOccuredInWindow((window) => failureResponseState.failure(window))
+      itImplmentsOccuredInWindow((window) => failureUpdatableResponse.failure(window))
     );
 
     describe('#pending', () => {
       it('returns false', () => {
-        expect(failureResponseState.pending()).toEqual(false);
-        expect(failureResponseState.pending(1000)).toEqual(false);
+        expect(failureUpdatableResponse.pending()).toEqual(false);
+        expect(failureUpdatableResponse.pending(1000)).toEqual(false);
       });
     });
 
     describe('#success', () => {
       it('returns false', () => {
-        expect(failureResponseState.success()).toEqual(false);
-        expect(failureResponseState.success(1000)).toEqual(false);
+        expect(failureUpdatableResponse.success()).toEqual(false);
+        expect(failureUpdatableResponse.success(1000)).toEqual(false);
       });
     });
   });
 
-  describe('PendingResponseState', () => {
-    var pendingResponseState;
+  describe('PendingUpdatableResponse', () => {
+    var pendingUpdatableResponse;
 
     beforeEach(() => {
-      pendingResponseState = ResponseState.pending();
+      pendingUpdatableResponse = UpdatableResponse.pending();
     });
 
     describe('#failure', () => {
       it('returns false', () => {
-        expect(pendingResponseState.failure()).toEqual(false);
-        expect(pendingResponseState.failure(1000)).toEqual(false);
+        expect(pendingUpdatableResponse.failure()).toEqual(false);
+        expect(pendingUpdatableResponse.failure(1000)).toEqual(false);
       });
     });
 
     describe('#pending',
-      itImplmentsOccuredInWindow((window) => pendingResponseState.pending(window))
+      itImplmentsOccuredInWindow((window) => pendingUpdatableResponse.pending(window))
     );
 
     describe('#success', () => {
       it('returns false', () => {
-        expect(pendingResponseState.success()).toEqual(false);
-        expect(pendingResponseState.success(1000)).toEqual(false);
+        expect(pendingUpdatableResponse.success()).toEqual(false);
+        expect(pendingUpdatableResponse.success(1000)).toEqual(false);
       });
     });
   });
 
-  describe('SuccessResponseState', () => {
-    var successResponseState;
+  describe('SuccessUpdatableResponse', () => {
+    var successUpdatableResponse;
 
     beforeEach(() => {
-      successResponseState = ResponseState.success();
+      successUpdatableResponse = UpdatableResponse.success();
     });
 
     describe('#failure', () => {
       it('returns false', () => {
-        expect(successResponseState.failure()).toEqual(false);
-        expect(successResponseState.failure(1000)).toEqual(false);
+        expect(successUpdatableResponse.failure()).toEqual(false);
+        expect(successUpdatableResponse.failure(1000)).toEqual(false);
       });
     });
 
     describe('#pending', () => {
       it('returns false', () => {
-        expect(successResponseState.pending()).toEqual(false);
-        expect(successResponseState.pending(1000)).toEqual(false);
+        expect(successUpdatableResponse.pending()).toEqual(false);
+        expect(successUpdatableResponse.pending(1000)).toEqual(false);
       });
     });
 
     describe('#success',
-      itImplmentsOccuredInWindow((window) => successResponseState.success(window))
+      itImplmentsOccuredInWindow((window) => successUpdatableResponse.success(window))
     );
   });
 });
