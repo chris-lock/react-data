@@ -1,63 +1,71 @@
 // @flow
 
+type Status = {
+  failure?: ?number,
+  pending?: ?number,
+  success?: ?number,
+};
+
 export default class UpdatableResponse {
-  static failure(): FailureUpdatableResponse {
-    return new FailureUpdatableResponse;
-  }
-
-
-  static pending(): PendingUpdatableResponse {
-    return new PendingUpdatableResponse;
-  }
-
-
-  static success(): SuccessUpdatableResponse {
-    return new SuccessUpdatableResponse;
-  }
-
-  _occurance: number = this._now();
-
-  failure(windowInMillseconds?: number): boolean {
-    return false;
-  }
-
-  pending(windowInMillseconds?: number): boolean {
-    return false;
-  }
-
-  success(windowInMillseconds?: number): boolean {
-    return false;
-  }
-
-  occuredInWindow(windowInMillseconds?: number): boolean {
-    return (
-      !windowInMillseconds
-      || (this._now() - windowInMillseconds) <= this._occurance
-    );
-  }
-
-  _now(): number {
+  static now(): number {
     return Date.now();
   }
-}
 
-class FailureUpdatableResponse
-extends UpdatableResponse {
+  static failure(): UpdatableResponse {
+    return new UpdatableResponse({
+      failure: this.now(),
+    });
+  }
+
+
+  static pending(updatableResponse?: UpdatableResponse): UpdatableResponse {
+    var previousStatus: Status = (updatableResponse)
+          ? updatableResponse.current
+          : {};
+
+    return new UpdatableResponse({
+      pending: this.now(),
+      ...previousStatus,
+    });
+  }
+
+
+  static success(): UpdatableResponse {
+    return new UpdatableResponse({
+      success: this.now(),
+    });
+  }
+
+  _status: Status = {};
+
+  get current(): Status {
+    return {
+      ...this._status,
+    };
+  }
+
   failure(windowInMillseconds?: number): boolean {
-    return this.occuredInWindow(windowInMillseconds);
+    return this._occuredInWindow(this._status.failure, windowInMillseconds);
   }
-}
 
-class PendingUpdatableResponse
-extends UpdatableResponse {
   pending(windowInMillseconds?: number): boolean {
-    return this.occuredInWindow(windowInMillseconds);
+    return this._occuredInWindow(this._status.pending, windowInMillseconds);
+  }
+
+  success(windowInMillseconds?: number): boolean {
+    return this._occuredInWindow(this._status.success, windowInMillseconds);
+  }
+
+  _occuredInWindow(occurence: ?number, windowInMillseconds?: number): boolean {
+    return (
+      !!occurence
+      && (
+        !windowInMillseconds
+        || (this.constructor.now() - windowInMillseconds) <= occurence
+      )
+    );
   }
 }
 
-class SuccessUpdatableResponse
-extends UpdatableResponse {
-  success(windowInMillseconds?: number): boolean {
-    return this.occuredInWindow(windowInMillseconds);
-  }
-}
+// circular reference
+// insights pending api calls

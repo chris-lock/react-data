@@ -4,7 +4,7 @@ import NonIterable from 'NonIterable';
 import UpdatableResponse from 'UpdatableResponse';
 
 import type {
-  AccessorKey,
+  WriteKey,
 } from 'Service';
 
 type Listener = () => void;
@@ -16,15 +16,15 @@ export default class Updatable {
     return this._response;
   }
 
-  isFailure(accessorKey: AccessorKey): void {
+  isFailure(accessorKey: WriteKey): void {
     this._response = UpdatableResponse.failure();
   }
 
-  isPending(accessorKey: AccessorKey): void {
+  isPending(accessorKey: WriteKey): void {
     this._response = UpdatableResponse.pending();
   }
 
-  isSuccess(accessorKey: AccessorKey): void {
+  isSuccess(accessorKey: WriteKey): void {
     this._response = UpdatableResponse.success();
   }
 }
