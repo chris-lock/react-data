@@ -1,6 +1,7 @@
 // @flow
 
 import Updatable from 'Updatable';
+import Associations from 'Associations';
 
 export type RecordData = {};
 
@@ -15,44 +16,16 @@ extends Updatable {
   }
 }
 
-// type Interface<method> = {
-//   [_:method]: () => boolean,
-// };
-// type FooIsh = Interface<'test'>;
-
-// class Foo {
-
-// }
-
-// const foo: FooIsh = new Foo;
-
-// foo.test();
-
-class Association {
-  static belongsTo<
-    B: Rec<*>,
-    Key: $Keys<$PropertyType<B, 'data'>>,
-  >(
-    a: $ElementType<$PropertyType<B, 'data'>, Key>,
-    key: Key,
-    b: Class<B>
-  ): B {
-    return new b;
-  }
-}
-
-class Rec<Data: {}> {
-  data: Data;
-}
-
 type DataFoo = {
   c: boolean,
 };
 
 class Foo
-extends Rec<DataFoo> {
+extends Record<DataFoo> {
+  _data: DataFoo;
+
   get b(): boolean {
-    return this.data.c;
+    return this._data.c;
   }
 }
 
@@ -61,8 +34,10 @@ type DataBar = {
 };
 
 class Bar
-extends Rec<DataBar> {
+extends Record<DataBar> {
+  _data: DataBar;
+
   get a(): Foo {
-    return Association.belongsTo(this, 'c', Foo);
+    return Associations.belongsTo(this, 'c', Foo);
   }
 }

@@ -38,6 +38,10 @@ export default class UpdatableResponse {
 
   _status: Status = {};
 
+  constructor(status: Status) {
+    this._status = status;
+  }
+
   get current(): Status {
     return {
       ...this._status,
@@ -66,6 +70,3 @@ export default class UpdatableResponse {
     );
   }
 }
-
-// circular reference
-// insights pending api calls

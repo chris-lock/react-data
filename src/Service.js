@@ -1,47 +1,26 @@
 // @flow
 
-class Key {}
+import Writer from 'Writer';
 
-const KEY: Key = new Key;
+import type {
+  WriteKey,
+} from 'Writer';
 
-export type WriteKey = Key;
+export type ServicePayload = {};
 
-export default class Service<Payload: {}> {
-  _key: Key = KEY;
+export default class Service<Payload: ServicePayload>
+extends Writer {
+  _payload: Payload;
 
   constructor(payload: Payload) {
-    this._run(this._key, payload);
+    super();
+
+    this._payload = payload;
   }
 
-  _run(key: Key, payload: Payload) {}
+  _withKey(key: WriteKey): void {
+    this._run(key, this._payload);
+  }
+
+  _run(key: WriteKey, payload: Payload) {}
 }
-
-// class Foo {
-//   _run(key) {
-//     Collection.update(key)
-//       .get()
-//       .onSuccess()
-//       .onFailure();
-//   }
-// }
-
-// class Foo {
-//   _run(key) {
-//     Collection.update(key)
-//       .success()
-//       .failure();
-//   }
-// }
-
-// class Bar {
-//   _run(key) {
-//     Collection.update(key)
-//       .and(
-//         Collection.update(key),
-//         Collection.update(key)
-//       )
-//       .get()
-//       .onSuccess()
-//       .onFailure();
-//   }
-// }

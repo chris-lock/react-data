@@ -5,7 +5,7 @@ import UpdatableResponse from 'UpdatableResponse';
 
 import type {
   WriteKey,
-} from 'Service';
+} from 'Writer';
 
 type Listener = () => void;
 
