@@ -28,36 +28,41 @@ extends Updatable {
 
 // foo.test();
 
-class Rec<Data: {}> {
-  data: Data;
-
-  belongsTo<
-    Data: {},
-    On: $Keys<Data>,
-    Belongs: Rec<Data>
-  >(belongs: Class<Belongs>, on: On): Belongs {
-    return new belongs;
+class Association {
+  static belongsTo<
+    B: Rec<*>,
+    Key: $Keys<$PropertyType<B, 'data'>>,
+  >(
+    a: $ElementType<$PropertyType<B, 'data'>, Key>,
+    key: Key,
+    b: Class<B>
+  ): B {
+    return new b;
   }
 }
 
-type DataA = {
-  c: B,
+class Rec<Data: {}> {
+  data: Data;
+}
+
+type DataFoo = {
+  c: boolean,
 };
 
-class A
-extends Rec<DataA> {
-  get b(): B {
+class Foo
+extends Rec<DataFoo> {
+  get b(): boolean {
     return this.data.c;
   }
 }
 
-type DataB = {
-  a: A,
+type DataBar = {
+  a: Foo,
 };
 
-class B
-extends Rec<DataB> {
-  get a(): A {
-    return this.belongsTo(A, 'b');
+class Bar
+extends Rec<DataBar> {
+  get a(): Foo {
+    return Association.belongsTo(this, 'c', Foo);
   }
 }
