@@ -33,4 +33,13 @@ class Bar {
       .onFailure();
   }
 }
+SubscriptionService.pause()
+
+class SubscriptionService {
+  pause(payload) {
+    new SubscriptionPause(payload)
+  }
+}
+
+export default new SubscriptionService
 ```
