@@ -1,9 +1,9 @@
 // @flow
 
-export type RecordData = {};
+export type RecordSchema = {};
 
-export default class Record<Data: RecordData> {
-  _data: Data;
+export default class Record<Schema: RecordSchema> {
+  _data: Schema;
 }
 
 export type OneToOne<
