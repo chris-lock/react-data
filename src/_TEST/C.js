@@ -3,9 +3,7 @@
 import Record from './Record';
 import B from './B';
 import D from './D';
-import Associations, {
-  oneToOne,
-} from './Associations';
+import Associations from './Associations';
 
 type CSchema = {
   b: B,

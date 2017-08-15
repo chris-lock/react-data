@@ -2,22 +2,6 @@
 
 import Record from './Record';
 
-export function oneToOne<
-  Local,
-  LocalKey: $Keys<$PropertyType<Local, '_data'>>,
-  Foreign,
-  ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
->(oneToOne: {
-  from: [
-    Class<Local> & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
-    LocalKey,
-  ],
-  to: [
-    Class<Foreign> & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
-    ForeignKey,
-  ],
-}): void {}
-
 class Associations {
   oneToOne<
     Local,
@@ -26,11 +10,15 @@ class Associations {
     ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
   >(oneToOne: {
     from: [
-      Class<Local> & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
+      Class<Local>
+        & Class<Record<*>>
+        & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
       LocalKey,
     ],
     to: [
-      Class<Foreign> & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
+      Class<Foreign>
+        & Class<Record<*>>
+        & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
       ForeignKey,
     ],
   }): Associations {
