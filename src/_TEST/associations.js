@@ -1,17 +1,13 @@
 // @flow
 
-export type RecordSchema = {};
+import Record from './Record';
 
-export default class Record<Schema: RecordSchema> {
-  _data: Schema;
-}
-
-export type OneToOne<
-  Local: Record<*>,
+export function oneToOne<
+  Local,
   LocalKey: $Keys<$PropertyType<Local, '_data'>>,
-  Foreign: Record<*>,
+  Foreign,
   ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
-> = {
+>(oneToOne: {
   from: [
     Class<Local> & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
     LocalKey,
@@ -20,63 +16,26 @@ export type OneToOne<
     Class<Foreign> & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
     ForeignKey,
   ],
-};
+}): void {}
 
-export type OneToMany<
-  Local: Record<*>,
-  LocalKey: $Keys<$PropertyType<Local, '_data'>>,
-  Foreign: Record<*>,
-  ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
-> = {
-  from: [
-    Class<Local>
-      & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
-    LocalKey,
-  ],
-  to: [
-    Class<Foreign>
-      & Class<$ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>>,
-    ForeignKey,
-  ],
-};
+class Associations {
+  oneToOne<
+    Local,
+    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    Foreign,
+    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+  >(oneToOne: {
+    from: [
+      Class<Local> & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
+      LocalKey,
+    ],
+    to: [
+      Class<Foreign> & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
+      ForeignKey,
+    ],
+  }): Associations {
+    return this;
+  }
+}
 
-export type ManyToMany<
-  Local: Record<*>,
-  LocalKey: $Keys<$PropertyType<Local, '_data'>>,
-  Foreign: Record<*>,
-  ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
-> = {
-  from: [
-    Class<Local>
-      & Class<$ElementType<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>, 0>>,
-    LocalKey,
-  ],
-  to: [
-    Class<Foreign>
-      & Class<$ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>>,
-    ForeignKey,
-  ],
-};
-
-// class ClassA
-// extends Record {
-//   static associations: typeof Associations = Associations
-//     .oneToOne({
-//       local: ClassA,
-//       localKey: 'b',
-//       foreign: ClassB,
-//       foreignKey: 'a',
-//     })
-//     .oneToMany({
-//       local: ClassA,
-//       localKey: 'c',
-//       foreign: ClassC,
-//       foreignKey: 'a',
-//     })
-//     .manyToMany({
-//       local: ClassA,
-//       localKey: 'd',
-//       foreign: ClassD,
-//       foreignKey: 'a',
-//     });
-// }
+export default new Associations;

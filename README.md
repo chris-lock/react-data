@@ -42,4 +42,27 @@ class SubscriptionService {
 }
 
 export default new SubscriptionService
+
+class ClassA
+extends Record {
+  static associations: typeof Associations = Associations
+    .oneToOne({
+      local: ClassA,
+      localKey: 'b',
+      foreign: ClassB,
+      foreignKey: 'a',
+    })
+    .oneToMany({
+      local: ClassA,
+      localKey: 'c',
+      foreign: ClassC,
+      foreignKey: 'a',
+    })
+    .manyToMany({
+      local: ClassA,
+      localKey: 'd',
+      foreign: ClassD,
+      foreignKey: 'a',
+    });
+}
 ```

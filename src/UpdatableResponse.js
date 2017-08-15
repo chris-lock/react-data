@@ -38,7 +38,7 @@ export default class UpdatableResponse {
 
   _status: Status = {};
 
-  constructor(status: Status) {
+  constructor(status: Status = {}) {
     this._status = status;
   }
 

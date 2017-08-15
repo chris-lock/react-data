@@ -9,7 +9,7 @@ import type {
 
 export default class Collection<Data: RecordData, Item: Record<Data>>
 extends Updatable {
-  _dataClass: Class<Item> = Data;
+  _dataClass: Class<Item>;
 
   add(data: Data): void {
     this._addItem(data);
