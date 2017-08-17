@@ -16,15 +16,15 @@ export default class Updatable {
     return this._response;
   }
 
-  isFailure(accessorKey: WriteKey): void {
+  isFailure(key: WriteKey): void {
     this._response = UpdatableResponse.failure();
   }
 
-  isPending(accessorKey: WriteKey): void {
+  isPending(key: WriteKey): void {
     this._response = UpdatableResponse.pending();
   }
 
-  isSuccess(accessorKey: WriteKey): void {
+  isSuccess(key: WriteKey): void {
     this._response = UpdatableResponse.success();
   }
 }

@@ -9,24 +9,71 @@ import type Record from 'Record';
 
 class Associations
 extends Writer {
-  belongsTo<
-    B: Record<*>,
-    Key: $Keys<$PropertyType<B, '_data'>>,
-  >(
-    a: $ElementType<$PropertyType<B, '_data'>, Key>,
-    key: Key,
-    b: Class<B>
-  ): B {
-    return new b({});
+  oneToOne<
+    Local,
+    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    Foreign,
+    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+  >(oneToOne: {
+    from: [
+      Class<Local>
+        & Class<Record<*>>
+        & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
+      LocalKey,
+    ],
+    to: [
+      Class<Foreign>
+        & Class<Record<*>>
+        & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
+      ForeignKey,
+    ],
+  }): Associations {
+    return this;
   }
 
-  getAssociation: (a: Record<*>) => void;
-
-  _withKey(key: WriteKey): void {
-    this.getAssociation = this._getAssociation.bind(this, key);
+  oneToMany<
+    Local,
+    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    Foreign,
+    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+  >(oneToOne: {
+    from: [
+      Class<Local>
+        & Class<Record<*>>
+        & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
+      LocalKey,
+    ],
+    to: [
+      Class<Foreign>
+        & Class<Record<*>>
+        & Class<$ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>>,
+      ForeignKey,
+    ],
+  }): Associations {
+    return this;
   }
 
-  _getAssociation(key: WriteKey, a: Record<*>): void {}
+  manyToMany<
+    Local,
+    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    Foreign,
+    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+  >(oneToOne: {
+    from: [
+      Class<Local>
+        & Class<Record<*>>
+        & Class<$ElementType<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>, 0>>,
+      LocalKey,
+    ],
+    to: [
+      Class<Foreign>
+        & Class<Record<*>>
+        & Class<$ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>>,
+      ForeignKey,
+    ],
+  }): Associations {
+    return this;
+  }
 }
 
 export default new Associations;

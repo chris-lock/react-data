@@ -3,13 +3,17 @@
 import Updatable from 'Updatable';
 import Associations from 'Associations';
 
-export type RecordData = {};
+import type {
+  WriteKey,
+} from 'Writer';
 
-export default class Record<Data: RecordData>
+export type Schema = {};
+
+export default class Record<RecordSchema: Schema>
 extends Updatable {
-  _data: Data;
+  _data: RecordSchema;
 
-  constructor(data: Data) {
+  constructor(key: WriteKey, data: RecordSchema) {
     super();
 
     this._data = data;
