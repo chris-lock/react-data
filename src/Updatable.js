@@ -1,7 +1,7 @@
 // @flow
 
-import NonIterable from 'NonIterable';
-import UpdatableResponse from 'UpdatableResponse';
+import NonIterable from './NonIterable';
+import UpdatableResponse from './UpdatableResponse';
 
 import type {
   WriteKey,

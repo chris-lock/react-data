@@ -1,10 +1,10 @@
 // @flow
 
-import Writer from 'Writer';
+import Writer from './Writer';
 
 import type {
   WriteKey,
-} from 'Writer';
+} from './Writer';
 
 export type ServicePayload = {};
 

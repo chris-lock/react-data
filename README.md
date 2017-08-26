@@ -1,7 +1,8 @@
-circular reference
-many to many
-insights pending api calls
-initial fetch for insights
+- circular reference
+- many to many
+- insights pending api calls
+- initial fetch for insights
+- keyboard events
 
 ```es6
 class Foo {
