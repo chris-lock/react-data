@@ -11,7 +11,7 @@ export type Schema = {
 };
 
 export default class Record<RecordSchema: Schema> {
-  static collection: Collection<$Subtype<Schema>, $Subtype<Record<*>>> = new Collection(this);
+  static collection: Collection<RecordSchema> = new Collection(this);
   static all = this.collection.all;
   static find = this.collection.find;
   static where = this.collection.where;
@@ -29,6 +29,12 @@ export default class Record<RecordSchema: Schema> {
   }
 }
 
-Record.where({
-  foo: true,
-})
+type FooSchema = (Schema & {
+  foo: boolean,
+});
+
+class Foo extends Record<FooSchema> {}
+
+Foo.where((schema: Schema) => {
+  return !schema;
+});
