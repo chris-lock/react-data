@@ -10,17 +10,17 @@ export type Schema = {
   foo: boolean,
 };
 
-export default class Record<RecordSchema: Schema> {
-  static collection: Collection<RecordSchema> = new Collection(this);
+export default class Record<Record$Schema: Schema> {
+  static collection: Collection<Record$Schema> = new Collection(this);
   static all = this.collection.all;
   static find = this.collection.find;
   static where = this.collection.where;
   static add = this.collection.add;
   static remove = this.collection.remove;
 
-  _data: RecordSchema;
+  _data: Record$Schema;
 
-  constructor(key: WriteKey, data: RecordSchema) {
+  constructor(key: WriteKey, data: Record$Schema) {
     this._data = data;
   }
 
@@ -35,6 +35,10 @@ type FooSchema = (Schema & {
 
 class Foo extends Record<FooSchema> {}
 
-Foo.where((schema: Schema) => {
+Foo.where((schema: FooSchema) => {
   return !schema;
+});
+
+Foo.where({
+  foo: true,
 });

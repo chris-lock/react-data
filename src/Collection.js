@@ -8,18 +8,18 @@ import type {
   WriteKey,
 } from './Writer';
 
-type QueryMethod<Schema> = (schema: Schema) => boolean;
-type QueryObject<Schema> = $Subtype<Schema>;
-type Query<Schema> = QueryObject<Schema>|QueryMethod<Schema>;
+type QueryMethod<Record$Schema> = (schema: Record$Schema) => boolean;
+type QueryObject<Record$Schema> = $Shape<Record$Schema>;
+type Query<Record$Schema> = QueryObject<Record$Schema>|QueryMethod<Record$Schema>;
 
 export default class Collection<
-  Schema: Schema
+  Record$Schema: Schema
 > extends Writer {
-  _all: Array<$Subtype<Record<Schema>>> = [];
+  _all: Array<Record$Schema> = [];
   _key: WriteKey;
-  _recordClass: Class<$Subtype<Record<Schema>>>;
+  _recordClass: Class<$Subtype<Record<Record$Schema>>>;
 
-  constructor(recordClass: Class<$Subtype<Record<Schema>>>) {
+  constructor(recordClass: Class<$Subtype<Record<Record$Schema>>>) {
     super();
 
     this._recordClass = recordClass;
@@ -29,23 +29,23 @@ export default class Collection<
     // return this._all.slice(0);
   }
 
-  find(query: Query<Schema>): void {
+  find(query: Query<Record$Schema>): void {
     // return this.where(query)[0];
   }
 
-  where(query: Query<Schema>): void {
-    // var queryMethod: QueryMethod<Schema> = this._queryMethod(query);
+  where(query: Query<Record$Schema>): void {
+    // var queryMethod: QueryMethod<Record$Schema> = this._queryMethod(query);
 
     // return this._all.filter(
     //   (record: Record): boolean => queryMethod(record.data(this._key))
     // );
   }
 
-  add(key: WriteKey, schema: Schema): void {
+  add(key: WriteKey, schema: Record$Schema): void {
     // return new this._recordClass(key, schema);
   }
 
-  remove(key: WriteKey, query: Query<Schema>): void {
+  remove(key: WriteKey, query: Query<Record$Schema>): void {
 
   }
 
@@ -53,13 +53,13 @@ export default class Collection<
     this._key = key;
   }
 
-  _queryMethod(query: Query<Schema>): QueryMethod<Schema> {
+  _queryMethod(query: Query<Record$Schema>): QueryMethod<Record$Schema> {
     return (typeof query === 'function')
       ? query
       : this._queryObjectMethod.bind(this, query);
   }
 
-  _queryObjectMethod(query: QueryObject<Schema>, schema: Schema): boolean {
+  _queryObjectMethod(query: QueryObject<Record$Schema>, schema: Record$Schema): boolean {
     return Object.keys(query).every(
       (key: string): boolean => schema[key] === query[key]
     );
