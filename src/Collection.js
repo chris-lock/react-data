@@ -8,12 +8,28 @@ import type {
   WriteKey,
 } from './Writer';
 
-type QueryMethod<Record$Schema> = (schema: Record$Schema) => boolean;
 type QueryObject<Record$Schema> = $Shape<Record$Schema>;
-type Query<Record$Schema> = QueryObject<Record$Schema>|QueryMethod<Record$Schema>;
+type QueryMethod<
+  Record$Schema,
+  Component$Props,
+  Component$State
+> = (schema: Record$Schema, props: Component$Props, state: Component$State) => (
+  boolean
+  |QueryObject<Record$Schema>
+);
+type Query<
+  Record$Schema,
+  Component$Props,
+  Component$State
+> = (
+  QueryObject<Record$Schema>
+  |QueryMethod<Record$Schema, Component$Props, Component$State>
+);
 
 export default class Collection<
-  Record$Schema: Schema
+  Record$Schema: Schema,
+  Component$Props,
+  Component$State
 > extends Writer {
   _all: Array<Record$Schema> = [];
   _key: WriteKey;
@@ -29,23 +45,29 @@ export default class Collection<
     // return this._all.slice(0);
   }
 
-  find(query: Query<Record$Schema>): void {
+  find(
+    query: Query<Record$Schema, Component$Props, Component$State>
+  ): Collection<Record$Schema, Component$Props, Component$State> {
     // return this.where(query)[0];
+    return this;
   }
 
-  where(query: Query<Record$Schema>): void {
+  where(
+    query: Query<Record$Schema, Component$Props, Component$State>
+  ): Collection<Record$Schema, Component$Props, Component$State> {
     // var queryMethod: QueryMethod<Record$Schema> = this._queryMethod(query);
 
     // return this._all.filter(
     //   (record: Record): boolean => queryMethod(record.data(this._key))
     // );
+    return this;
   }
 
   add(key: WriteKey, schema: Record$Schema): void {
     // return new this._recordClass(key, schema);
   }
 
-  remove(key: WriteKey, query: Query<Record$Schema>): void {
+  remove(key: WriteKey, query: Query<Record$Schema, Component$Props, Component$State>): void {
 
   }
 
@@ -53,7 +75,9 @@ export default class Collection<
     this._key = key;
   }
 
-  _queryMethod(query: Query<Record$Schema>): QueryMethod<Record$Schema> {
+  _queryMethod(
+    query: Query<Record$Schema, Component$Props, Component$State>
+  ): QueryMethod<Record$Schema, Component$Props, Component$State> {
     return (typeof query === 'function')
       ? query
       : this._queryObjectMethod.bind(this, query);
