@@ -11,20 +11,20 @@ class Associations
 extends Writer {
   oneToOne<
     Local,
-    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    LocalKey: $Keys<$PropertyType<$PropertyType<Local, '_data'>, 'current'>>,
     Foreign,
-    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+    ForeignKey: $Keys<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>>,
   >(oneToOne: {
     from: [
       Class<Local>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
+        & Class<$ElementType<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>, ForeignKey>>,
       LocalKey,
     ],
     to: [
       Class<Foreign>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
+        & Class<$ElementType<$PropertyType<$PropertyType<Local, '_data'>, 'current'>, LocalKey>>,
       ForeignKey,
     ],
   }): Associations {
@@ -33,20 +33,20 @@ extends Writer {
 
   oneToMany<
     Local,
-    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    LocalKey: $Keys<$PropertyType<$PropertyType<Local, '_data'>, 'current'>>,
     Foreign,
-    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+    ForeignKey: $Keys<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>>,
   >(oneToOne: {
     from: [
       Class<Local>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>>,
+        & Class<$ElementType<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>, ForeignKey>>,
       LocalKey,
     ],
     to: [
       Class<Foreign>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>>,
+        & Class<$ElementType<$ElementType<$PropertyType<$PropertyType<Local, '_data'>, 'current'>, LocalKey>, 0>>,
       ForeignKey,
     ],
   }): Associations {
@@ -55,20 +55,20 @@ extends Writer {
 
   manyToMany<
     Local,
-    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    LocalKey: $Keys<$PropertyType<$PropertyType<Local, '_data'>, 'current'>>,
     Foreign,
-    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+    ForeignKey: $Keys<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>>,
   >(oneToOne: {
     from: [
       Class<Local>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>, 0>>,
+        & Class<$ElementType<$ElementType<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>, ForeignKey>, 0>>,
       LocalKey,
     ],
     to: [
       Class<Foreign>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>>,
+        & Class<$ElementType<$ElementType<$PropertyType<$PropertyType<Local, '_data'>, 'current'>, LocalKey>, 0>>,
       ForeignKey,
     ],
   }): Associations {
@@ -77,20 +77,20 @@ extends Writer {
 
   onlyToOne<
     Local,
-    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    LocalKey: $Keys<$PropertyType<$PropertyType<Local, '_data'>, 'current'>>,
     Foreign,
-    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+    ForeignKey: $Keys<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>>,
   >(oneToOne: {
     from: [
       Local
         & $Subtype<Record<*>>
-        & $ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>,
+        & $ElementType<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>, ForeignKey>,
       LocalKey,
     ],
     to: [
       Class<Foreign>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$PropertyType<Local, '_data'>, LocalKey>>,
+        & Class<$ElementType<$PropertyType<$PropertyType<Local, '_data'>, 'current'>, LocalKey>>,
       ForeignKey,
     ],
   }): Associations {
@@ -99,20 +99,20 @@ extends Writer {
 
   onlyToMany<
     Local,
-    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    LocalKey: $Keys<$PropertyType<$PropertyType<Local, '_data'>, 'current'>>,
     Foreign,
-    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+    ForeignKey: $Keys<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>>,
   >(oneToOne: {
     from: [
       Local
         & $Subtype<Record<*>>
-        & $ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>,
+        & $ElementType<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>, ForeignKey>,
       LocalKey,
     ],
     to: [
       Class<Foreign>
         & Class<$Subtype<Record<*>>>
-        & Class<$ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>>,
+        & Class<$ElementType<$ElementType<$PropertyType<$PropertyType<Local, '_data'>, 'current'>, LocalKey>, 0>>,
       ForeignKey,
     ],
   }): Associations {
@@ -121,20 +121,20 @@ extends Writer {
 
   onlyToOnly<
     Local,
-    LocalKey: $Keys<$PropertyType<Local, '_data'>>,
+    LocalKey: $Keys<$PropertyType<$PropertyType<Local, '_data'>, 'current'>>,
     Foreign,
-    ForeignKey: $Keys<$PropertyType<Foreign, '_data'>>,
+    ForeignKey: $Keys<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>>,
   >(oneToOne: {
     from: [
       Local
         & $Subtype<Record<*>>
-        & $ElementType<$ElementType<$PropertyType<Foreign, '_data'>, ForeignKey>, 0>,
+        & $ElementType<$ElementType<$PropertyType<$PropertyType<Foreign, '_data'>, 'current'>, ForeignKey>, 0>,
       LocalKey,
     ],
     to: [
       Foreign
         & $Subtype<Record<*>>
-        & $ElementType<$ElementType<$PropertyType<Local, '_data'>, LocalKey>, 0>,
+        & $ElementType<$ElementType<$PropertyType<$PropertyType<Local, '_data'>, 'current'>, LocalKey>, 0>,
       ForeignKey,
     ],
   }): Associations {

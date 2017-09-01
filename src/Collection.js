@@ -1,5 +1,7 @@
 // @flow
+
 import Writer from './Writer';
+import Data from './Data';
 
 import type Record, {
   Schema,
@@ -8,82 +10,70 @@ import type {
   WriteKey,
 } from './Writer';
 
-type QueryObject<Record$Schema> = $Shape<Record$Schema>;
-type QueryMethod<
-  Record$Schema,
-  Component$Props,
-  Component$State
-> = (schema: Record$Schema, props: Component$Props, state: Component$State) => (
+type Query$Method<Record$Schema> = (
+  schema: Record$Schema,
+  props: {},
+  state: {}
+) => (
   boolean
-  |QueryObject<Record$Schema>
+  |Query$Object<Record$Schema>
 );
-type Query<
-  Record$Schema,
-  Component$Props,
-  Component$State
-> = (
-  QueryObject<Record$Schema>
-  |QueryMethod<Record$Schema, Component$Props, Component$State>
+type Query$Object<Record$Schema> = $Shape<Record$Schema>;
+type Query<Record$Schema> = (
+  Query$Method<Record$Schema>
+  |Query$Object<Record$Schema>
 );
 
 export default class Collection<
-  Record$Schema: Schema,
-  Component$Props,
-  Component$State
+  Record$Schema: Schema
 > extends Writer {
-  _all: Array<Record$Schema> = [];
+  _data: Array<Data<Record$Schema>> = [];
   _key: WriteKey;
   _recordClass: Class<$Subtype<Record<Record$Schema>>>;
+  _query: ?Query<Record$Schema>;
 
-  constructor(recordClass: Class<$Subtype<Record<Record$Schema>>>) {
+  constructor(
+    recordClass: Class<$Subtype<Record<Record$Schema>>>,
+    query?: Query<Record$Schema>
+  ) {
     super();
 
     this._recordClass = recordClass;
+    this._query = query;
   }
 
   all(): void {
     // return this._all.slice(0);
   }
 
-  find(
-    query: Query<Record$Schema, Component$Props, Component$State>
-  ): Collection<Record$Schema, Component$Props, Component$State> {
+  find(query: Query<Record$Schema>): void {
     // return this.where(query)[0];
-    return this;
   }
 
-  where(
-    query: Query<Record$Schema, Component$Props, Component$State>
-  ): Collection<Record$Schema, Component$Props, Component$State> {
-    // var queryMethod: QueryMethod<Record$Schema> = this._queryMethod(query);
-
-    // return this._all.filter(
-    //   (record: Record): boolean => queryMethod(record.data(this._key))
-    // );
-    return this;
+  where(query: Query<Record$Schema>): Collection<Record$Schema> {
+    return new Collection(this._recordClass, query)
+      .newData(this._key, this._data);
   }
 
   add(key: WriteKey, schema: Record$Schema): void {
     // return new this._recordClass(key, schema);
   }
 
-  remove(key: WriteKey, query: Query<Record$Schema, Component$Props, Component$State>): void {
+  remove(key: WriteKey, query: Query<Record$Schema>): void {
 
   }
 
-  _withKey(key: WriteKey): void {
-    this._key = key;
+  newData(key: WriteKey, query: Array<Data<Record$Schema>>): Collection<Record$Schema> {
+    return this;
   }
 
-  _queryMethod(
-    query: Query<Record$Schema, Component$Props, Component$State>
-  ): QueryMethod<Record$Schema, Component$Props, Component$State> {
+  _queryMethod(query: Query<Record$Schema>): Query$Method<Record$Schema> {
     return (typeof query === 'function')
       ? query
       : this._queryObjectMethod.bind(this, query);
   }
 
-  _queryObjectMethod(query: QueryObject<Record$Schema>, schema: Record$Schema): boolean {
+  _queryObjectMethod(query: Query$Object<Record$Schema>, schema: Record$Schema): boolean {
     return Object.keys(query).every(
       (key: string): boolean => schema[key] === query[key]
     );

@@ -10,16 +10,12 @@ export type ServicePayload = {};
 
 export default class Service<Payload: ServicePayload>
 extends Writer {
-  _payload: Payload;
+  _key: WriteKey;
 
   constructor(payload: Payload) {
     super();
 
-    this._payload = payload;
-  }
-
-  _withKey(key: WriteKey): void {
-    this._run(key, this._payload);
+    this._run(this._key, payload);
   }
 
   _run(key: WriteKey, payload: Payload) {}

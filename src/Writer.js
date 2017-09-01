@@ -1,17 +1,13 @@
 // @flow
 
-class Key {}
+class WriteKey {}
 
-const KEY: Key = new Key;
+const KEY: WriteKey = new WriteKey;
 
-export type WriteKey = Key;
+export type {
+  WriteKey,
+};
 
 export default class Writer {
   _key: WriteKey = KEY;
-
-  constructor() {
-    this._withKey(this._key);
-  }
-
-  _withKey(key: WriteKey): void {}
 }
