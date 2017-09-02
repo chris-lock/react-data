@@ -1,8 +1,6 @@
-- circular reference
-- many to many
-- insights pending api calls
 - initial fetch for insights
 - keyboard events
+- representers don't work well with collections
 
 ```es6
 class Foo {

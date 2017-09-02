@@ -1,7 +1,6 @@
 // @flow
 
 import Writer from './Writer';
-import Data from './Data';
 
 import type Record, {
   Schema,
@@ -27,7 +26,7 @@ type Query<Record$Schema> = (
 export default class Collection<
   Record$Schema: Schema
 > extends Writer {
-  _data: Array<Data<Record$Schema>> = [];
+  _data: Array<Record$Schema> = [];
   _key: WriteKey;
   _recordClass: Class<$Subtype<Record<Record$Schema>>>;
   _query: ?Query<Record$Schema>;
@@ -63,7 +62,7 @@ export default class Collection<
 
   }
 
-  newData(key: WriteKey, query: Array<Data<Record$Schema>>): Collection<Record$Schema> {
+  newData(key: WriteKey, query: Array<Record$Schema>): Collection<Record$Schema> {
     return this;
   }
 

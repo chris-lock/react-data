@@ -1,18 +1,13 @@
 // @flow
 
 import Collection from './Collection';
-import Data from './Data';
 
-import type {
-  Schema,
-} from './Data';
 import type {
   WriteKey,
 } from './Writer';
 
-export type {
-  Schema,
-};
+export type Schema = {};
+export type Record$Collection<Record$Instance> = Collection<$PropertyType<Record$Instance, '_data'>>;
 
 export default class Record<Record$Schema: Schema> {
   static collection: Collection<Record$Schema> =
@@ -22,17 +17,17 @@ export default class Record<Record$Schema: Schema> {
   static add = this.collection.add;
   static remove = this.collection.remove;
 
-  _data: Data<Record$Schema>;
+  _data: Record$Schema;
 
-  constructor(key: WriteKey, data: Data<Record$Schema>) {
+  constructor(key: WriteKey, data: Record$Schema) {
     this._data = data;
   }
 
   data<Key: $Keys<Record$Schema>>(key: Key): ?$ElementType<Record$Schema, Key> {
-    return this._data.current[key];
+    return this._data[key];
   }
 
   update(key: WriteKey, newData: $Shape<Record$Schema>): void {
-    this._data.update(newData);
+
   }
 }
