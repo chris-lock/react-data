@@ -1,13 +1,8 @@
 // @flow
 
 import Record from './Record';
-import OneToOneA from './_OneToOneA';
 
-import type {
-  Record$Collection
-} from './Record';
-
-export type OneToOneB$Collection = Record$Collection<OneToOneB>;
+import type OneToOneA from './_OneToOneA';
 
 type OneToOneB$Schema = {
   a: OneToOneA,

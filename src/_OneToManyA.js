@@ -4,17 +4,10 @@ import Record from './Record';
 import Associations from './Associations';
 import OneToManyB from './_OneToManyB';
 
-import type {
-  Record$Collection
-} from './Record';
-import type {
-  OneToManyB$Collection,
-} from './_OneToManyB';
-
-export type OneToManyA$Collection = Record$Collection<OneToManyA>;
+import type Collection from './Collection';
 
 type OneToManyA$Schema = {
-  b: OneToManyA$Collection,
+  b: Collection<OneToManyB, *>,
 };
 
 export default class OneToManyA

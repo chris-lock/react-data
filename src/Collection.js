@@ -24,9 +24,10 @@ type Query<Record$Schema> = (
 );
 
 export default class Collection<
-  Record$Schema: Schema
+  Record$Instance: Record<*>,
+  Record$Schema: $PropertyType<Record$Instance, '_data'>
 > extends Writer {
-  _data: Array<Record$Schema> = [];
+  _data: Array<Record$Instance> = [];
   _key: WriteKey;
   _recordClass: Class<$Subtype<Record<Record$Schema>>>;
   _query: ?Query<Record$Schema>;
@@ -41,30 +42,13 @@ export default class Collection<
     this._query = query;
   }
 
-  all(): void {
-    // return this._all.slice(0);
-  }
+  find(query: Query<Record$Schema>): void {}
 
-  find(query: Query<Record$Schema>): void {
-    // return this.where(query)[0];
-  }
+  where(query: Query<Record$Schema>): void {}
 
-  where(query: Query<Record$Schema>): Collection<Record$Schema> {
-    return new Collection(this._recordClass, query)
-      .newData(this._key, this._data);
-  }
+  add(key: WriteKey, schema: Record$Schema): void {}
 
-  add(key: WriteKey, schema: Record$Schema): void {
-    // return new this._recordClass(key, schema);
-  }
-
-  remove(key: WriteKey, query: Query<Record$Schema>): void {
-
-  }
-
-  newData(key: WriteKey, query: Array<Record$Schema>): Collection<Record$Schema> {
-    return this;
-  }
+  remove(key: WriteKey, query: Query<Record$Schema>): void {}
 
   _queryMethod(query: Query<Record$Schema>): Query$Method<Record$Schema> {
     return (typeof query === 'function')

@@ -4,12 +4,6 @@ import Record from './Record';
 import Associations from './Associations';
 import OneToOneB from './_OneToOneB';
 
-import type {
-  Record$Collection
-} from './Record';
-
-export type OneToOneA$Collection = Record$Collection<OneToOneA>;
-
 type OneToOneA$Schema = {
   b: OneToOneB,
 };

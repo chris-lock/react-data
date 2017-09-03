@@ -7,10 +7,9 @@ import type {
 } from './Writer';
 
 export type Schema = {};
-export type Record$Collection<Record$Instance> = Collection<$PropertyType<Record$Instance, '_data'>>;
 
 export default class Record<Record$Schema: Schema> {
-  static collection: Collection<Record$Schema> =
+  static collection: Collection<$Subtype<Record<*>>, *> =
     new Collection((this: Class<$Subtype<Record<*>>>));
   static find = this.collection.find;
   static where = this.collection.where;
