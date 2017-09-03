@@ -7,7 +7,7 @@ import OneToManyB from './_OneToManyB';
 import type Collection from './Collection';
 
 type OneToManyA$Schema = {
-  b: Collection<OneToManyB, *>,
+  b: Collection<OneToManyB>,
 };
 
 export default class OneToManyA

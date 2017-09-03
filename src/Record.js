@@ -9,9 +9,9 @@ import type {
 export type Schema = {};
 
 export default class Record<Record$Schema: Schema> {
-  static collection: Collection<$Subtype<Record<*>>, *> =
+  static collection: Collection<$Subtype<Record<*>>> =
     new Collection((this: Class<$Subtype<Record<*>>>));
-  static find = this.collection.find;
+  static first = this.collection.first;
   static where = this.collection.where;
   static add = this.collection.add;
   static remove = this.collection.remove;
@@ -30,3 +30,17 @@ export default class Record<Record$Schema: Schema> {
 
   }
 }
+
+type Foo$Schema = {
+  foo: number,
+};
+
+class Foo
+extends Record<Foo$Schema> {
+  _data: Foo$Schema;
+}
+
+Foo.where({
+  foo: true,
+  bar: 1,
+})

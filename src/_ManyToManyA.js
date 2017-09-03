@@ -7,7 +7,7 @@ import ManyToManyB from './_ManyToManyB';
 import type Collection from './Collection';
 
 type ManyToManyA$Schema = {
-  b: Collection<ManyToManyB, *>,
+  b: Collection<ManyToManyB>,
 };
 
 export default class ManyToManyA
