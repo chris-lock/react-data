@@ -53,11 +53,11 @@
     "roots": [
       "./tests"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/tests/setup/setup.js",
+    "setupTestFrameworkScriptFile": "<rootDir>/tests/js/setup/setup.js",
     "moduleDirectories": [
       "node_modules",
-      "src",
-      "./tests/"
+      "./src",
+      "./tests/js/"
     ],
     "cacheDirectory": "<rootDir>/tmp/cache/jest"
   },

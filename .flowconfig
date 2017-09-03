@@ -5,9 +5,13 @@ module.system.node.resolve_dirname=src/
 module.system.node.resolve_dirname=node_modules
 munge_underscores=true
 suppress_comment=\\(.\\|\n\\)*\\@flow.bug
+suppress_comment=\\(.\\|\n\\)*\\@flow.test
 unsafe.enable_getters_and_setters=true
+
+[include]
+.*/test/flow/*
 
 [ignore]
 .*/node_modules/*
-.*/test/*
+.*/test/js/*
 .*/tmp/*

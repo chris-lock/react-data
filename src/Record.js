@@ -1,46 +1,67 @@
 // @flow
 
+import Association from './Association';
 import Collection from './Collection';
 
+import type {
+  Collection$Query,
+} from './Collection';
 import type {
   WriteKey,
 } from './Writer';
 
-export type Schema = {};
+export type Record$Child<Schema> = $Subtype<Record<Schema>>;
 
-export default class Record<Record$Schema: Schema> {
-  static collection: Collection<$Subtype<Record<*>>> =
-    new Collection((this: Class<$Subtype<Record<*>>>));
-  static first = this.collection.first;
-  static where = this.collection.where;
-  static add = this.collection.add;
-  static remove = this.collection.remove;
+export type Record$Class<Schema> = Class<Record$Child<Schema>>;
 
-  _data: Record$Schema;
+export type Record$Schema = {};
 
-  constructor(key: WriteKey, data: Record$Schema) {
+export default class Record<Schema: Record$Schema> {
+  static get association(): Association<Schema> {
+    return new Association((this: Record$Class<Schema>));
+  }
+
+  static collection: Collection<Schema>;
+
+  static ensureCollection(): Collection<Schema> {
+    return this.collection || this.setCollection();
+  }
+
+  static setCollection(): Collection<Schema> {
+    return (this.collection = new Collection((this: Record$Class<Schema>)));
+  }
+
+  static asCollection(): Record$Class<Schema> {
+    this.setCollection();
+
+    return this;
+  }
+
+  static first(query: Collection$Query<Schema>): void {
+    return this.ensureCollection().first(query);
+  }
+
+  static where(query: Collection$Query<Schema>): void {
+    return this.ensureCollection().where(query);
+  }
+
+  static add(key: WriteKey, schema: Schema): void {
+    this.ensureCollection().add(key, schema);
+  }
+
+  static remove(key: WriteKey, query: Collection$Query<Schema>): void {
+    this.ensureCollection().remove(key, query);
+  }
+
+  _data: Schema;
+
+  constructor(key: WriteKey, data: Schema) {
     this._data = data;
   }
 
-  data<Key: $Keys<Record$Schema>>(key: Key): ?$ElementType<Record$Schema, Key> {
+  data<Key: $Keys<Schema>>(key: Key): ?$ElementType<Schema, Key> {
     return this._data[key];
   }
 
-  update(key: WriteKey, newData: $Shape<Record$Schema>): void {
-
-  }
+  update(key: WriteKey, newData: $Shape<Schema>): void {}
 }
-
-type Foo$Schema = {
-  foo: number,
-};
-
-class Foo
-extends Record<Foo$Schema> {
-  _data: Foo$Schema;
-}
-
-Foo.where({
-  foo: true,
-  bar: 1,
-})
