@@ -17,10 +17,7 @@ export type Record$Class<Schema> = Class<Record$Child<Schema>>;
 export type Record$Schema = {};
 
 export default class Record<Schema: Record$Schema> {
-  static get association(): Association<Schema> {
-    return new Association((this: Record$Class<Schema>));
-  }
-
+  static association: Association<Schema> = new Association;
   static collection: Collection<Schema>;
 
   static ensureCollection(): Collection<Schema> {

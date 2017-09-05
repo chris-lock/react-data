@@ -3,16 +3,17 @@
 import Record from 'Record';
 
 import type Association from 'Association';
+import type Collection from 'Collection';
 
 // @flow.describe --------------------------------------------------------------
   type Pass$A$Schema = {
-    b: Pass$B,
+    b: Pass$B$Collection,
   };
 
   class Pass$A
   extends Record<Pass$A$Schema> {
     static associations: Association<Pass$A$Schema> = this.association
-      .oneToOne({
+      .oneToMany({
         from: [Pass$A, 'b'],
         to: [Pass$B, 'a'],
       });
@@ -23,6 +24,8 @@ import type Association from 'Association';
   type Pass$B$Schema = {
     a: Pass$A,
   };
+
+  type Pass$B$Collection = Collection<Pass$B$Schema>;
 
   class Pass$B
   extends Record<Pass$B$Schema> {
