@@ -38,7 +38,7 @@ export default class Record<Schema: Record$Schema> {
     return this.collection.first(query);
   }
 
-  static where(query: Collection$Query<Schema>): void {
+  static where(query: Collection$Query<Schema>): Collection<Schema> {
     return this.collection.where(query);
   }
 
