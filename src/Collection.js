@@ -1,9 +1,12 @@
 // @flow
 
-import Writer from './Writer';
+import QueryManager from './QueryManager';
 import RecordManager from './RecordManager';
 import Callback from './Callback';
 
+import type {
+  Query,
+} from './QueryManager';
 import type Record, {
   Record$Schema,
   Record$Child,
@@ -12,22 +15,11 @@ import type Record, {
 import type {
   WriteKey,
 } from './Writer';
+import type {
+  RecordManager$Callback,
+} from './RecordManager';
 
-type Query$Method<Record$Schema> = (
-  schema: Record$Schema,
-  props: {},
-  state: {}
-) => (
-  boolean
-  |Query$Object<Record$Schema>
-);
-
-type Query$Object<Record$Schema> = $Shape<Record$Schema>;
-
-export type Collection$Query<Record$Schema> = (
-  Query$Method<Record$Schema>
-  |Query$Object<Record$Schema>
-);
+export type Collection$Query<Schema> = Query<Schema>;
 
 type ItterableMethod<Schema, Return> = (
   currentValue: Record$Child<Schema>,
@@ -37,13 +29,11 @@ type ItterableMethod<Schema, Return> = (
 
 export default class Collection<
   Schema: Record$Schema
-> extends Writer {
-  _key: WriteKey;
-  _query: ?Collection$Query<Schema>;
+> {
+  _queryManager: QueryManager<Schema>;
   _recordClass: Record$Class<Schema>;
   _recordManager: RecordManager<Schema>;
-  _records: Array<Record$Child<Schema>> = [];
-  _onAddCallback: Callback<Record$Child<Schema>> = new Callback(this._onAdd);
+  _onAddCallback: RecordManager$Callback<Schema> = new Callback(this._onAdd);
 
   constructor(
     recordClass: Record$Class<Schema>,
@@ -52,12 +42,16 @@ export default class Collection<
   ) {
     super();
 
-    this._query = query;
+    this._queryManager = new QueryManager(query);
     this._recordClass = recordClass;
     this._recordManager = recordManager || new RecordManager;
-    this._records = this._recordManager.records.map();
 
-    this._recordManager.addCallback(this._onAddCallback);
+    this._recordManager.addDependency(this._onAddCallback);
+    this._recordManager.addRecords(this._recordManager.records);
+  }
+
+  _onAdd(records: Array<Record$Child<Schema>>): void {
+    this._queryManager.addRecords(records);
   }
 
   first(query: Collection$Query<Schema>): void {}
@@ -71,54 +65,53 @@ export default class Collection<
   }
 
   foreach(method: ItterableMethod<Schema, void>, thisArg?: any): void {
-    return this._records.forEach(method, thisArg);
+    return this._records().forEach(method, thisArg);
+  }
+
+  _records(): Array<Record$Child<Schema>> {
+    return this._queryManager.records;
   }
 
   map<Return>(method: ItterableMethod<Schema, Return>, thisArg?: any): Array<Return> {
-    return this._records.map(method, thisArg);
+    return this._records().map(method, thisArg);
   }
 
   find(method: ItterableMethod<Schema, boolean>, thisArg?: any): ?Record$Class<Schema> {
-    return this._records.find(method, thisArg);
+    return this._records().find(method, thisArg);
   }
 
   every(method: ItterableMethod<Schema, boolean>, thisArg?: any): boolean {
-    return this._records.every(method, thisArg);
+    return this._records().every(method, thisArg);
   }
 
   some(method: ItterableMethod<Schema, boolean>, thisArg?: any): boolean {
-    return this._records.some(method, thisArg);
+    return this._records().some(method, thisArg);
   }
 
   all(): Array<Record$Child<Schema>> {
-    return this._records.slice(0);
+    return this._records().slice(0);
   }
 
-  add(key: WriteKey, schema: Schema): void {
-    this._recordManager.addRecord(
-      new this._recordClass(this._key, schema)
+  add(key: WriteKey, schema: Schema, ...schemas: Array<Schema>): void {
+    this._recordManager.addRecords(
+      [schema, ...schemas].map((schema: Schema) =>
+        new this._recordClass(key, schema)
+      )
     );
   }
 
   remove(key: WriteKey, query: Collection$Query<Schema>): void {}
 
+  version<Props, State>(props: Props, state: State): string {
+    return this._queryManager.version(
+      this._recordManager.records,
+      props,
+      state
+    );
+  }
+
   destory(): void {
     this._onAddCallback.destory();
+    this._queryManager.destory();
   }
-
-  _onAdd(record: Record$Child<Schema>): void {
-    this._records.push(record);
-  }
-
-  // _queryMethod(query: Query<Record$Schema>): Query$Method<Record$Schema> {
-  //   return (typeof query === 'function')
-  //     ? query
-  //     : this._queryObjectMethod.bind(this, query);
-  // }
-
-  // _queryObjectMethod(query: Query$Object<Record$Schema>, schema: Record$Schema): boolean {
-  //   return Object.keys(query).every(
-  //     (key: string): boolean => schema[key] === query[key]
-  //   );
-  // }
 }

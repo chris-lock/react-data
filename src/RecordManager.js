@@ -1,20 +1,25 @@
 // @flow
 
-import CallbackManager from './CallbackManager';
+import DependencyManager from './DependencyManager';
 
+import type Callback from './Callback';
 import type {
   Record$Schema,
   Record$Child,
 } from './Record';
 
+export type RecordManager$Callback<Schema> = Callback<Array<Record$Child<Schema>>>;
+
 export default class RecordManager<
   Schema: Record$Schema
->extends CallbackManager<Record$Child<Schema>> {
+>extends DependencyManager<RecordManager$Callback<Schema>> {
   records: Array<Record$Child<Schema>> = [];
 
-  addRecord(record: Record$Child<Schema>) {
-    this.records.push(record);
+  addRecords(records: Array<Record$Child<Schema>>) {
+    this.records.push(...records);
 
-    this.run(record);
+    this.pruneDepencies((depency: RecordManager$Callback<Schema>): boolean =>
+      depency.run(records)
+    );
   }
 }
