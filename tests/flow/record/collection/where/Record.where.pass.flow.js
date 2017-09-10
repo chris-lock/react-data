@@ -17,9 +17,9 @@ extends Record<Pass$Schema> {
   });
 
 // @flow.describe --------------------------------------------------------------
-  Pass.where((schema: Pass$Schema, props: {}, state: {}): Pass$Schema => ({
+  Pass.where((props: {}, state: {}): Pass$Schema => ({
     pass: true,
   }));
 
 // @flow.describe --------------------------------------------------------------
-  Pass.where((schema: Pass$Schema, props: {}, state: {}): boolean => true);
+  Pass.where((props: {}, state: {}, schema: Pass$Schema): boolean => true);

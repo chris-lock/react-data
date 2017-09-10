@@ -56,7 +56,11 @@ export default class Record<Schema: Record$Schema> {
     this._data = data;
   }
 
-  data<Key: $Keys<Schema>>(key: Key): ?$ElementType<Schema, Key> {
+  data(key: WriteKey): Schema {
+    return this._data;
+  }
+
+  dataItem<Key: $Keys<Schema>>(key: Key): ?$ElementType<Schema, Key> {
     return this._data[key];
   }
 

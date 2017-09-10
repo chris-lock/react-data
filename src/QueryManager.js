@@ -1,13 +1,17 @@
 // @flow
 
+import Writer from './Writer';
 import VersionManager from './VersionManager';
 
 import type Record, {
   Record$Schema,
   Record$Child,
 } from './Record';
+import type {
+  WriteKey,
+} from './Writer';
 
-type Query$Method<Props, State, Schema> = (
+type Query$Dynamic<Props, State, Schema> = (
   props: Props,
   state: State,
   schema: Schema
@@ -21,139 +25,219 @@ type Query$Method<Props, State, Schema> = (
 type Query$Object$Static<Schema> = $Shape<Schema>;
 
 export type Query<Schema> = (
-  Query$Method<*, *, Schema>
+  Query$Dynamic<*, *, Schema>
   |Query$Object$Computed<*, *, Schema>
   |Query$Object$Static<Schema>
 );
 
-type Query$Type = {
-  isComputedObject: boolean,
-  isMethod: boolean,
-  isStaticObject: boolean,
-};
+class StaticQueryMethod<
+  Schema: Record$Schema,
+  Props: {},
+  State: {}
+> {
+  changed(props: ?Props, state: ?State): boolean {
+    return false;
+  }
 
-export default class QueryManager<Schema: Record$Schema> {
+  matches(schema: Schema): boolean {
+    return true;
+  }
+}
+
+class QueryMethod<
+  Schema: Record$Schema,
+  Query,
+  Props: {},
+  State: {}
+>
+extends StaticQueryMethod<
+  Schema,
+  Props,
+  State
+> {
+  static isStatic: boolean = false;
+
+  props: ?Props;
+  query: Query;
+  state: ?State;
+
+  constructor(query: Query) {
+    super();
+
+    this.query = query;
+  }
+
+  changed(props: ?Props, state: ?State): boolean {
+    return (
+      !this.constructor.isStatic
+      && (
+        this._changed(props, this.props)
+        || this._changed(state, this.state)
+      )
+      && this._methodChanged(props, state)
+    );
+  }
+
+  _changed(comparison: ?{}, base: ?{}): boolean {
+    return !!(
+      comparison
+      && base
+      && !this.objectMatches(comparison, base)
+    );
+  }
+
+  _methodChanged(props: ?Props, state: ?State): boolean {
+    return true;
+  }
+
+  matches(schema: Schema): boolean {
+    return true;
+  }
+
+  objectMatches<Base: {}>(
+    comparison: $Shape<Base>,
+    base: Base,
+  ): boolean {
+    return Object.keys(comparison).every(
+      (key: string): boolean => base[key] === comparison[key]
+    );
+  }
+}
+
+class StaticObjectQueryMethod<
+  Schema: Record$Schema,
+  Props: {},
+  State: {}
+>
+extends QueryMethod<
+  Schema,
+  Query$Object$Static<Schema>,
+  Props,
+  State
+> {
+  static isStatic: boolean = true;
+
+  matches(schema: Schema): boolean {
+    return this.objectMatches(this.query, schema);
+  }
+}
+
+class ComputedObjectQueryMethod<
+  Schema: Record$Schema,
+  Props: {},
+  State: {}
+>
+extends QueryMethod<
+  Schema,
+  Query$Object$Computed<Props, State, Schema>,
+  Props,
+  State
+> {
+  _schema: ?Query$Object$Static<Schema>;
+
+  matches(schema: Schema): boolean {
+    return (
+      !!this._schema
+      && this.objectMatches(this._schema, schema)
+    );
+  }
+
+  _methodChanged(props: ?Props, state: ?State): boolean {
+    this._updatePropsAndState(props, state);
+
+    if (this.props && this.state) {
+      let schema: Query$Object$Static<Schema> = this.query(this.props, this.state);
+
+      if (!this._schema || !this.objectMatches(schema, this._schema)) {
+        this._schema = schema;
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  _updatePropsAndState(props: ?Props, state: ?State): void {
+    if (props) {
+      this.props = props;
+    }
+
+    if (state) {
+      this.state = state;
+    }
+  }
+}
+
+class DynamicQueryMethod<
+  Schema: Record$Schema,
+  Props: {},
+  State: {}
+>
+extends QueryMethod<
+  Schema,
+  Query$Dynamic<Props, State, Schema>,
+  Props,
+  State
+> {
+  matches(schema: Schema): boolean {
+    return (
+      !!this.props
+      && !!this.state
+      && this.query(this.props, this.state, schema)
+    );
+  }
+}
+
+export default class QueryManager<Schema: Record$Schema>
+extends Writer {
   records: Array<Record$Child<Schema>> = [];
-  _method: ?Query$Method<Schema, *, *>;
-  _type: Query$Type = {
-    isComputedObject: false,
-    isMethod: false,
-    isStaticObject: false,
-  };
-  _unfilteredRecords: Array<Record$Child<Schema>> = [];
+  _key: WriteKey;
+  _queryMethod: StaticQueryMethod<Schema, *, *>;
   _versionManager: VersionManager = new VersionManager;
 
   constructor(query: ?Query<Schema>) {
-    if (query) {
-      if (query instanceof Function) {
-        this._method = query;
+    super();
 
-        if (query.length === 2) {
-          this._type.isComputedObject = true;
-        } else {
-          this._type.isMethod = true;
-        }
-      } else if (query instanceof Object) {
-        this._type.isStaticObject = true;
-        this._method = this._compareObjects.bind(this, query);
+    if (!query) {
+      this._queryMethod = new StaticQueryMethod;
+    } else if (query instanceof Function) {
+      if (query.length === 2) {
+        this._queryMethod = new ComputedObjectQueryMethod(query);
+      } else {
+        this._queryMethod = new DynamicQueryMethod(query);
       }
+    } else if (query instanceof Object) {
+      this._queryMethod = new StaticObjectQueryMethod(query);
     }
   }
 
-  _compareObjects<Props, State>(
-    query: Query$Object<Schema>,
-    schema: Schema,
-    props: Props,
-    state: State
-  ): boolean {
-    return Object.keys(query).every(
-      (key: string): boolean => schema[key] === query[key]
-    );
+  updateParams<
+    Props: {},
+    State: {}
+  >(props: ?Props, state: ?State): void {
+    if (this._queryMethod.changed(props, state)) {
+      let records: Array<Record$Child<Schema>> = this.records;
+
+      this.records = [];
+      this.addRecords(records);
+    }
   }
 
   addRecords(records: Array<Record$Child<Schema>>): void {
-    if (this._type.isStaticObject) {
-      this._filterRecords(records, [], {}, {});
-    } else {
-      this._unfilteredRecords.push(...records);
-    }
+    this.records.push(...this._filterRecords(records));
   }
 
-  _filterRecords<Props, State>(
-    unfliteredRecords: Array<Record$Child<Schema>>,
-    previousRecords: Array<Record$Child<Schema>>,
-    props: Props,
-    state: State
-  ): void {
-    this.records.push(...unfliteredRecords.filter(
-      this._filter.bind(this, previousRecords, props, state)
-    ));
+  _filterRecords(records: Array<Record$Child<Schema>>): Array<Record$Child<Schema>> {
+    return records.filter((record: Record$Child<Schema>): boolean =>
+      this._queryMethod.matches(record.data(this._key))
+      && record.addVersionManager(this._versionManager)
+      && this._versionManager.clear()
+    );
   }
 
-  _filter<Props, State>(
-    previousRecords: Array<Record$Child<Schema>>,
-    props: Props,
-    state: State,
-    record: Record$Child<Schema>
-  ): boolean {
-    var matches: boolean = this._method({}, props, state),
-        removedFromPreviousRecords: boolean = !matches && previousRecords.indexOf(record) > 0,
-        addedToRecords: boolean = matches && !removedFromPreviousRecords;
-
-    if (removedFromPreviousRecords || matches) {
-      this._versionManager.clear();
-    }
-
-    if (matches) {
-      // record.addVersionDependency(this._key, this._versionManager);
-    }
-
-    return matches;
-  }
-
-  version<Props, State>(
-    allRecords: Array<Record$Child<Schema>>,
-    props: Props,
-    state: State
-  ): string {
-    this._filterRecordsForVersion(allRecords, props, state);
-
+  version(): string {
     return this._versionManager.version();
-  }
-
-  _filterRecordsForVersion<Props, State>(
-    allRecords: Array<Record$Child<Schema>>,
-    props: Props,
-    state: State
-  ): void {
-    var previousRecords: Array<Record$Child<Schema>> = [];
-
-    if (this._queryObjectHasChanged(props, state)) {
-      previousRecords = this.records;
-
-      this.records = [];
-      this._unfilteredRecords = allRecords;
-      this._versionManager.destory();
-      this._versionManager = new VersionManager;
-    }
-
-    this._filterRecords(
-      this._unfilteredRecords,
-      previousRecords,
-      props,
-      state
-    );
-  }
-
-  _queryObjectHasChanged<Props, State>(props: Props, state: State): boolean {
-    return (
-      !this._type.hasBeenSet
-      || this._type.isMethod
-      || (
-        this._type.isComputedObject
-        // && this.
-      )
-    );
   }
 
   destory(): void {

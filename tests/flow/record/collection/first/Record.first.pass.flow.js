@@ -17,9 +17,9 @@ extends Record<Pass$Schema> {
   });
 
 // @flow.describe --------------------------------------------------------------
-  Pass.first((schema: Pass$Schema, props: {}, state: {}): Pass$Schema => ({
+  Pass.first((props: {}, state: {}): Pass$Schema => ({
     pass: true,
   }));
 
 // @flow.describe --------------------------------------------------------------
-  Pass.first((schema: Pass$Schema, props: {}, state: {}): boolean => true);
+  Pass.first((props: {}, state: {}, schema: Pass$Schema): boolean => true);

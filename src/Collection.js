@@ -47,7 +47,7 @@ export default class Collection<
     this._recordManager = recordManager || new RecordManager;
 
     this._recordManager.addDependency(this._onAddCallback);
-    this._recordManager.addRecords(this._recordManager.records);
+    this._onAdd(this._recordManager.records);
   }
 
   _onAdd(records: Array<Record$Child<Schema>>): void {
@@ -94,7 +94,7 @@ export default class Collection<
 
   add(key: WriteKey, schema: Schema, ...schemas: Array<Schema>): void {
     this._recordManager.addRecords(
-      [schema, ...schemas].map((schema: Schema) =>
+      [schema, ...schemas].map((schema: Schema): Record$Child<Schema> =>
         new this._recordClass(key, schema)
       )
     );
@@ -102,12 +102,15 @@ export default class Collection<
 
   remove(key: WriteKey, query: Collection$Query<Schema>): void {}
 
-  version<Props, State>(props: Props, state: State): string {
-    return this._queryManager.version(
-      this._recordManager.records,
-      props,
-      state
-    );
+  updateQueryParams<
+    Props: {},
+    State: {}
+  >(props: ?Props, state: ?State): void {
+    this._queryManager.updateParams(props, state);
+  }
+
+  version(): string {
+    return this._queryManager.version();
   }
 
   destory(): void {

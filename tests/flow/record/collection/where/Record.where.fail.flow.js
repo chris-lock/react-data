@@ -26,31 +26,24 @@ extends Record<Fail$Schema> {
   });
 
 // @flow.describe --------------------------------------------------------------
-  // @flow.fix - `where` schema parameter is wrong type
-  Fail.where((schema: '__FAIL__'): $Shape<Fail$Schema> => ({}));
-
   // @flow.fix - `where` props parameter is wrong type
-  Fail.where((schema: Fail$Schema, props: '__FAIL__'): $Shape<Fail$Schema> => ({}));
+  Fail.where((props: '__FAIL__', state: {}): $Shape<Fail$Schema> => ({}));
 
   // @flow.fix - `where` state parameter is wrong type
-  Fail.where((schema: Fail$Schema, props: {}, state: '__FAIL__'): $Shape<Fail$Schema> => ({}));
+  Fail.where((props: {}, state: '__FAIL__'): $Shape<Fail$Schema> => ({}));
+
+  // @flow.fix - `where` return is wrong type
+  Fail.where((props: {}, state: {}): string => '__FAIL__');
 
 // @flow.describe --------------------------------------------------------------
-  // @flow.fix - `where` schema parameter is wrong type
-  Fail.where((schema: '__FAIL__'): boolean => true);
-
   // @flow.fix - `where` props parameter is wrong type
-  Fail.where((schema: Fail$Schema, props: '__FAIL__'): boolean => true);
+  Fail.where((props: '__FAIL__', state: {}, schema: Fail$Schema): boolean => true);
 
   // @flow.fix - `where` state parameter is wrong type
-  Fail.where((schema: Fail$Schema, props: {}, state: '__FAIL__'): boolean => true);
+  Fail.where((props: {}, state: '__FAIL__', schema: Fail$Schema): boolean => true);
 
-// @flow.describe --------------------------------------------------------------
-  // @flow.fix - `where` return type is wrong
-  Fail.where((schema: Fail$Schema): string => '__FAIL__');
+  // @flow.fix - `where` schema parameter is wrong type
+  Fail.where((props: {}, state: {}, schema: '__FAIL__'): boolean => true);
 
-  // @flow.fix - `where` return type is wrong
-  Fail.where((schema: Fail$Schema, props: {}): string => '__FAIL__');
-
-  // @flow.fix - `where` return type is wrong
-  Fail.where((schema: Fail$Schema, props: {}, state: {}): string => '__FAIL__');
+  // @flow.fix - `where` return is wrong type
+  Fail.where((props: {}, state: {}, schema: Fail$Schema): string => '__FAIL__');
