@@ -2,6 +2,7 @@
 
 import Association from './Association';
 import Collection from './Collection';
+import VersionManager from './VersionManager';
 
 import type {
   Collection$Query,
@@ -50,7 +51,9 @@ export default class Record<Schema: Record$Schema> {
     this.collection.remove(key, query);
   }
 
+  _collection: ?Collection<Schema>;
   _data: Schema;
+  _versionManager: VersionManager = new VersionManager;
 
   constructor(key: WriteKey, data: Schema) {
     this._data = data;
@@ -65,4 +68,39 @@ export default class Record<Schema: Record$Schema> {
   }
 
   update(key: WriteKey, newData: $Shape<Schema>): void {}
+
+  versionManager(key: WriteKey): VersionManager {
+    return this._versionManager;
+  }
+
+  asCollection(key: WriteKey, collection: Collection<Schema>): Record$Child<Schema> {
+    this._collection = collection;
+    this._collection.onFirstRecordChange(key, this._onRecordAsCollectionChange);
+
+    return this;
+  }
+
+  _onRecordAsCollectionChange(data: Schema): void {
+    this._data = data;
+    this._versionManager.clear();
+  }
+
+  updateQueryParams<
+    Props: {},
+    State: {}
+  >(props: ?Props, state: ?State): void {
+    if (this._collection) {
+      this._collection.updateQueryParams(props, state);
+    }
+  }
+
+  version(): string {
+    return this._versionManager.version();
+  }
+
+  destory(): void {
+    if (this._collection) {
+      this._collection.destory();
+    }
+  }
 }

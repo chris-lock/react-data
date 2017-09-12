@@ -1,7 +1,9 @@
 // @flow
 
+import Writer from './Writer';
 import QueryManager from './QueryManager';
 import RecordManager from './RecordManager';
+import Iterable from './Iterable';
 import Callback from './Callback';
 
 import type {
@@ -29,11 +31,14 @@ type ItterableMethod<Schema, Return> = (
 
 export default class Collection<
   Schema: Record$Schema
-> {
+>
+extends Writer {
+  _key: WriteKey;
+  _iterable: Iterable<Record$Child<Schema>>;
+  _onAddRecordsCallback: RecordManager$Callback<Schema> = new Callback(this._onAddRecords);
   _queryManager: QueryManager<Schema>;
   _recordClass: Record$Class<Schema>;
   _recordManager: RecordManager<Schema>;
-  _onAddCallback: RecordManager$Callback<Schema> = new Callback(this._onAdd);
 
   constructor(
     recordClass: Record$Class<Schema>,
@@ -46,15 +51,28 @@ export default class Collection<
     this._recordClass = recordClass;
     this._recordManager = recordManager || new RecordManager;
 
-    this._recordManager.addDependency(this._onAddCallback);
-    this._onAdd(this._recordManager.records);
+    this._recordManager.addDependency(this._onAddRecordsCallback);
+    this._onAddRecords(this._recordManager.records);
+    this._iterable = new Iterable(this._queryManager.records);
   }
 
-  _onAdd(records: Array<Record$Child<Schema>>): void {
+  _onAddRecords(records: Array<Record$Child<Schema>>): void {
     this._queryManager.addRecords(records);
   }
 
-  first(query: Collection$Query<Schema>): void {}
+  first(query: Collection$Query<Schema>): Record$Child<Schema> {
+    return this
+      ._newRecord(({}: $Shape<Schema>))
+      .asCollection(this._key, this.where(query));
+  }
+
+  _newRecord(schema: Schema): Record$Child<Schema> {
+    return new this._recordClass(this._key, schema);
+  }
+
+  onFirstRecordChange(key: WriteKey, method: (data: Schema) => void): void {
+    this._queryManager.onFirstRecordChange(method);
+  }
 
   where(query: Collection$Query<Schema>): Collection<Schema> {
     return new Collection(
@@ -64,39 +82,9 @@ export default class Collection<
     );
   }
 
-  foreach(method: ItterableMethod<Schema, void>, thisArg?: any): void {
-    return this._records().forEach(method, thisArg);
-  }
-
-  _records(): Array<Record$Child<Schema>> {
-    return this._queryManager.records;
-  }
-
-  map<Return>(method: ItterableMethod<Schema, Return>, thisArg?: any): Array<Return> {
-    return this._records().map(method, thisArg);
-  }
-
-  find(method: ItterableMethod<Schema, boolean>, thisArg?: any): ?Record$Class<Schema> {
-    return this._records().find(method, thisArg);
-  }
-
-  every(method: ItterableMethod<Schema, boolean>, thisArg?: any): boolean {
-    return this._records().every(method, thisArg);
-  }
-
-  some(method: ItterableMethod<Schema, boolean>, thisArg?: any): boolean {
-    return this._records().some(method, thisArg);
-  }
-
-  all(): Array<Record$Child<Schema>> {
-    return this._records().slice(0);
-  }
-
   add(key: WriteKey, schema: Schema, ...schemas: Array<Schema>): void {
     this._recordManager.addRecords(
-      [schema, ...schemas].map((schema: Schema): Record$Child<Schema> =>
-        new this._recordClass(key, schema)
-      )
+      [schema, ...schemas].map(this._newRecord)
     );
   }
 
@@ -114,7 +102,19 @@ export default class Collection<
   }
 
   destory(): void {
-    this._onAddCallback.destory();
+    this._onAddRecordsCallback.destory();
     this._queryManager.destory();
   }
+
+  foreach = this._iterable.foreach;
+
+  map = this._iterable.map;
+
+  find = this._iterable.find;
+
+  every = this._iterable.every;
+
+  some = this._iterable.some;
+
+  all = this._iterable.all;
 }

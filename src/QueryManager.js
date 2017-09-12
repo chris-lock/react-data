@@ -35,6 +35,8 @@ class StaticQueryMethod<
   Props: {},
   State: {}
 > {
+  schema: ?Query$Object$Static<Schema>;
+
   changed(props: ?Props, state: ?State): boolean {
     return false;
   }
@@ -133,12 +135,10 @@ extends QueryMethod<
   Props,
   State
 > {
-  _schema: ?Query$Object$Static<Schema>;
-
   matches(schema: Schema): boolean {
     return (
-      !!this._schema
-      && this.objectMatches(this._schema, schema)
+      !!this.schema
+      && this.objectMatches(this.schema, schema)
     );
   }
 
@@ -148,8 +148,8 @@ extends QueryMethod<
     if (this.props && this.state) {
       let schema: Query$Object$Static<Schema> = this.query(this.props, this.state);
 
-      if (!this._schema || !this.objectMatches(schema, this._schema)) {
-        this._schema = schema;
+      if (!this.schema || !this.objectMatches(schema, this.schema)) {
+        this.schema = schema;
 
         return true;
       }
@@ -193,6 +193,7 @@ export default class QueryManager<Schema: Record$Schema>
 extends Writer {
   records: Array<Record$Child<Schema>> = [];
   _key: WriteKey;
+  _onFirstRecordChangeMethod: ?(data: Schema) => void;
   _queryMethod: StaticQueryMethod<Schema, *, *>;
   _versionManager: VersionManager = new VersionManager;
 
@@ -224,16 +225,49 @@ extends Writer {
     }
   }
 
-  addRecords(records: Array<Record$Child<Schema>>): void {
+  addRecords(
+    records: Array<Record$Child<Schema>>,
+    queryMethodChange: boolean = false
+  ): void {
+    var firstRecord: ?Record$Child<Schema> = this.records[0];
+
     this.records.push(...this._filterRecords(records));
+
+    if (queryMethodChange || firstRecord !== this.records[0]) {
+      this._onFirstRecordChange(this._firstRecordData(firstRecord));
+    }
   }
 
   _filterRecords(records: Array<Record$Child<Schema>>): Array<Record$Child<Schema>> {
     return records.filter((record: Record$Child<Schema>): boolean =>
       this._queryMethod.matches(record.data(this._key))
-      && record.addVersionManager(this._versionManager)
+      && record.versionManager(this._key).addDependency(this._versionManager)
       && this._versionManager.clear()
     );
+  }
+
+  _firstRecordData(firstRecord: ?Record$Child<Schema>): Schema {
+    var data: ?Schema;
+
+    if (firstRecord) {
+      data = firstRecord.data(this._key);
+    }
+
+    return (
+      data
+      || (this._queryMethod.schema: $Shape<Schema>)
+      || ({}: $Shape<Schema>)
+    );
+  }
+
+  _onFirstRecordChange(data: Schema): void {
+    if (this._onFirstRecordChangeMethod) {
+      this._onFirstRecordChangeMethod(data);
+    }
+  }
+
+  onFirstRecordChange(method: (data: Schema) => void): void {
+    this._onFirstRecordChangeMethod = method;
   }
 
   version(): string {
