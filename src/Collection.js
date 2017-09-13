@@ -49,7 +49,10 @@ extends Writer {
 
     this._queryManager = new QueryManager(query);
     this._recordClass = recordClass;
-    this._recordManager = recordManager || new RecordManager;
+    this._recordManager = recordManager || new RecordManager(
+      this._key,
+      this._recordClass
+    );
 
     this._recordManager.addDependency(this._onAddRecordsCallback);
     this._onAddRecords(this._recordManager.records);

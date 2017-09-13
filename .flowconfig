@@ -8,6 +8,9 @@ suppress_comment=\\(.\\|\n\\)*\\@flow.bug
 suppress_comment=\\(.\\|\n\\)*\\@flow.test
 unsafe.enable_getters_and_setters=true
 
+[libs]
+lib/
+
 [include]
 .*/test/flow/*
 
