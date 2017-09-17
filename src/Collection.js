@@ -55,7 +55,7 @@ extends Writer {
       this._recordClass
     );
 
-    this._recordManager.addDisposable(this._onAddRecordsDisposableCallback);
+    this._recordManager.addDependency(this._onAddRecordsDisposableCallback);
     this._onAddRecords(this._recordManager.records);
     this._iterable = new Iterable(this._queryManager.records);
   }
@@ -101,7 +101,7 @@ extends Writer {
     this._queryManager.updateParams(props, state);
   }
 
-  version(): string {
+  version(): number {
     return this._queryManager.version();
   }
 
@@ -110,7 +110,7 @@ extends Writer {
     this._queryManager.dispose();
   }
 
-  foreach = this._iterable.foreach;
+  forEach = this._iterable.forEach;
 
   map = this._iterable.map;
 

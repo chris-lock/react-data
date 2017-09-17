@@ -94,7 +94,7 @@ export default class Record<Schema: Record$Schema> {
     }
   }
 
-  version(): string {
+  version(): number {
     return this._versionManager.version();
   }
 

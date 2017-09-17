@@ -1,3 +1,5 @@
 import Writer from 'Writer';
 
-export default Writer._key;
+const WriterKey = (new Writer)._key;
+
+export default WriterKey;

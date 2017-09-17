@@ -6,14 +6,14 @@ export default class DisposableManager<Disposable$Child: $Subtype<Disposable>>
 extends Disposable {
   _dependencies: Array<Disposable$Child> = [];
 
-  addDisposable(disposable: Disposable$Child): void {
-    this._dependencies.push(disposable);
+  addDependency(dependency: Disposable$Child): void {
+    this._dependencies.push(dependency);
   }
 
-  prune(method: (disposable: Disposable$Child) => boolean): void {
+  prune(method: (dependency: Disposable$Child) => boolean): void {
     this._dependencies = this._dependencies
-      .filter((disposable: Disposable$Child): boolean =>
-        !disposable.destroyed && method(disposable)
+      .filter((dependency: Disposable$Child): boolean =>
+        !dependency.disposed && method(dependency)
       );
   }
 }

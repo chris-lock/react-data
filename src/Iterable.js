@@ -12,7 +12,7 @@ export default class Iterable<Item> {
     this._items = items;
   }
 
-  foreach(method: Iterable$Method<Item, void>, thisArg?: any): void {
+  forEach(method: Iterable$Method<Item, void>, thisArg?: any): void {
     return this._items.forEach(this._iterableMethod(method), thisArg);
   }
 

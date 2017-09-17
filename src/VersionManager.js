@@ -4,23 +4,23 @@ import DisposableManager from './DisposableManager';
 
 export default class VersionManager
 extends DisposableManager<VersionManager> {
-  _version: ?string;
-  _versionIndex: number = 0;
+  _version: ?number;
+  _versionIndex: number = 1;
 
-  version(): string {
+  version(): number {
     return this._version || this._setVersion();
   }
 
-  _setVersion(): string {
-    var version: Array<string> = [
-          `${this._versionIndex}`
-        ];
+  _setVersion(): number {
+    const version = this._versionIndex;
 
-    this.prune((versionManager: VersionManager): boolean =>
-      !!version.push(versionManager.version())
+    this._version = version;
+
+    this.prune((dependency: VersionManager): boolean =>
+      !!dependency.version()
     );
 
-    return this._version = version.join();
+    return version;
   }
 
   clear(): boolean {
@@ -28,8 +28,8 @@ extends DisposableManager<VersionManager> {
       this._version = null;
       this._versionIndex++;
 
-      this.prune((versionManager: VersionManager): boolean =>
-        versionManager.clear()
+      this.prune((dependency: VersionManager): boolean =>
+        dependency.clear()
       );
     }
 

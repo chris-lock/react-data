@@ -7,15 +7,15 @@ describe('RecordManager', () => {
   class RecordTest
   extends Record {}
 
-  const SEED_RECORD = {
+  const seedRecord = {
     foo: true,
   };
-  const SEED_RECORDS = [
-    SEED_RECORD,
+  const seedRecords = [
+    seedRecord,
   ];
 
   describe('new', () => {
-    var recordManager;
+    let recordManager;
 
     beforeEach(() => {
       recordManager = new RecordManager(WriteKey, RecordTest);
@@ -29,14 +29,14 @@ describe('RecordManager', () => {
 
     describe('with bootstrapped data', () => {
       beforeAll(() => {
-        Data.seed('RecordTest', SEED_RECORDS);
-        Data.seed('__FAIL__RecordTest', SEED_RECORDS);
+        Data.seed('RecordTest', seedRecords);
+        Data.seed('__FAIL__$RecordTest', seedRecords);
       });
 
       it('it generates all records bootstrapped under it’s class name', () => {
         expect(recordManager.records.length).toEqual(1);
         expect(recordManager.records[0] instanceof RecordTest).toEqual(true);
-        expect(recordManager.records[0]._data).toEqual(SEED_RECORD);
+        expect(recordManager.records[0]._data).toEqual(seedRecord);
       });
     });
   });

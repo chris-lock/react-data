@@ -229,7 +229,7 @@ extends Writer {
     records: Array<Record$Child<Schema>>,
     queryMethodChange: boolean = false
   ): void {
-    var firstRecord: ?Record$Child<Schema> = this.records[0];
+    const firstRecord: ?Record$Child<Schema> = this.records[0];
 
     this.records.push(...this._filterRecords(records));
 
@@ -241,23 +241,23 @@ extends Writer {
   _filterRecords(records: Array<Record$Child<Schema>>): Array<Record$Child<Schema>> {
     return records.filter((record: Record$Child<Schema>): boolean =>
       this._queryMethod.matches(record.data(this._key))
-      && record.versionManager(this._key).addDisposable(this._versionManager)
+      && record.versionManager(this._key).addDependency(this._versionManager)
       && this._versionManager.clear()
     );
   }
 
   _firstRecordData(firstRecord: ?Record$Child<Schema>): Schema {
-    var data: ?Schema;
-
-    if (firstRecord) {
-      data = firstRecord.data(this._key);
-    }
-
     return (
-      data
+      this._recordData(firstRecord)
       || (this._queryMethod.schema: $Shape<Schema>)
       || ({}: $Shape<Schema>)
     );
+  }
+
+  _recordData(record: ?Record$Child<Schema>): ?Schema {
+    if (record) {
+      return record.data(this._key);
+    }
   }
 
   _onFirstRecordChange(data: Schema): void {
@@ -270,7 +270,7 @@ extends Writer {
     this._onFirstRecordChangeMethod = method;
   }
 
-  version(): string {
+  version(): number {
     return this._versionManager.version();
   }
 
