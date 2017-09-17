@@ -1,11 +1,11 @@
 // @flow
 
-import Dependency from './Dependency';
+import Disposable from './Disposable';
 
 type Method<Arg> = (arg: Arg) => void;
 
-export default class Callback<Arg>
-extends Dependency {
+export default class DisposableCallback<Arg>
+extends Disposable {
   _method: Method<Arg>;
 
   constructor(method: Method<Arg>) {

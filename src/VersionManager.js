@@ -1,9 +1,9 @@
 // @flow
 
-import DependencyManager from './DependencyManager';
+import DisposableManager from './DisposableManager';
 
 export default class VersionManager
-extends DependencyManager<VersionManager> {
+extends DisposableManager<VersionManager> {
   _version: ?string;
   _versionIndex: number = 0;
 
@@ -16,8 +16,8 @@ extends DependencyManager<VersionManager> {
           `${this._versionIndex}`
         ];
 
-    this.pruneDepencies((dependency: VersionManager): boolean =>
-      !!version.push(dependency.version())
+    this.prune((versionManager: VersionManager): boolean =>
+      !!version.push(versionManager.version())
     );
 
     return this._version = version.join();
@@ -28,8 +28,8 @@ extends DependencyManager<VersionManager> {
       this._version = null;
       this._versionIndex++;
 
-      this.pruneDepencies((dependency: VersionManager): boolean =>
-        dependency.clear()
+      this.prune((versionManager: VersionManager): boolean =>
+        versionManager.clear()
       );
     }
 

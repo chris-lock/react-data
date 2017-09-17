@@ -98,9 +98,9 @@ export default class Record<Schema: Record$Schema> {
     return this._versionManager.version();
   }
 
-  destory(): void {
+  dispose(): void {
     if (this._collection) {
-      this._collection.destory();
+      this._collection.dispose();
     }
   }
 }

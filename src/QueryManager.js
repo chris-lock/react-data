@@ -241,7 +241,7 @@ extends Writer {
   _filterRecords(records: Array<Record$Child<Schema>>): Array<Record$Child<Schema>> {
     return records.filter((record: Record$Child<Schema>): boolean =>
       this._queryMethod.matches(record.data(this._key))
-      && record.versionManager(this._key).addDependency(this._versionManager)
+      && record.versionManager(this._key).addDisposable(this._versionManager)
       && this._versionManager.clear()
     );
   }
@@ -274,7 +274,7 @@ extends Writer {
     return this._versionManager.version();
   }
 
-  destory(): void {
-    this._versionManager.destory();
+  dispose(): void {
+    this._versionManager.dispose();
   }
 }

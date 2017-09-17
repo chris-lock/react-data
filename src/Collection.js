@@ -4,7 +4,7 @@ import Writer from './Writer';
 import QueryManager from './QueryManager';
 import RecordManager from './RecordManager';
 import Iterable from './Iterable';
-import Callback from './Callback';
+import DisposableCallback from './DisposableCallback';
 
 import type {
   Query,
@@ -18,7 +18,7 @@ import type {
   WriteKey,
 } from './Writer';
 import type {
-  RecordManager$Callback,
+  RecordManager$DisposableCallback,
 } from './RecordManager';
 
 export type Collection$Query<Schema> = Query<Schema>;
@@ -35,7 +35,8 @@ export default class Collection<
 extends Writer {
   _key: WriteKey;
   _iterable: Iterable<Record$Child<Schema>>;
-  _onAddRecordsCallback: RecordManager$Callback<Schema> = new Callback(this._onAddRecords);
+  _onAddRecordsDisposableCallback: RecordManager$DisposableCallback<Schema>
+    = new DisposableCallback(this._onAddRecords);
   _queryManager: QueryManager<Schema>;
   _recordClass: Record$Class<Schema>;
   _recordManager: RecordManager<Schema>;
@@ -54,7 +55,7 @@ extends Writer {
       this._recordClass
     );
 
-    this._recordManager.addDependency(this._onAddRecordsCallback);
+    this._recordManager.addDisposable(this._onAddRecordsDisposableCallback);
     this._onAddRecords(this._recordManager.records);
     this._iterable = new Iterable(this._queryManager.records);
   }
@@ -104,9 +105,9 @@ extends Writer {
     return this._queryManager.version();
   }
 
-  destory(): void {
-    this._onAddRecordsCallback.destory();
-    this._queryManager.destory();
+  dispose(): void {
+    this._onAddRecordsDisposableCallback.dispose();
+    this._queryManager.dispose();
   }
 
   foreach = this._iterable.foreach;

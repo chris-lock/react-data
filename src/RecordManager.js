@@ -1,8 +1,8 @@
 // @flow
 
-import DependencyManager from './DependencyManager';
+import DisposableManager from './DisposableManager';
 
-import type Callback from './Callback';
+import type DisposableCallback from './DisposableCallback';
 import type {
   Record$Schema,
   Record$Child,
@@ -12,11 +12,11 @@ import type {
   WriteKey,
 } from './Writer';
 
-export type RecordManager$Callback<Schema> = Callback<Array<Record$Child<Schema>>>;
+export type RecordManager$DisposableCallback<Schema> = DisposableCallback<Array<Record$Child<Schema>>>;
 
 export default class RecordManager<
   Schema: Record$Schema
->extends DependencyManager<RecordManager$Callback<Schema>> {
+>extends DisposableManager<RecordManager$DisposableCallback<Schema>> {
   records: Array<Record$Child<Schema>> = [];
   _recordClass: Record$Class<Schema>;
 
@@ -35,8 +35,8 @@ export default class RecordManager<
   addRecords(records: Array<Record$Child<Schema>>) {
     this.records.push(...records);
 
-    this.pruneDepencies((depency: RecordManager$Callback<Schema>): boolean =>
-      depency.run(records)
+    this.prune((recordManager: RecordManager$DisposableCallback<Schema>): boolean =>
+      recordManager.run(records)
     );
   }
 
