@@ -1,8 +1,16 @@
 - initial fetch for insights
 - keyboard events
 - only exports
--- Record, { Association, Collection, Iterable }
--- Service, { WriteKey }
+    - Record, { Association, Collection }
+    - Service, { WriteKey }
+- data only returns iterables or frozen objects
+- iterable implements includes and slice
+- disposables don’t work with sibling records (1:1) switching since one record would have to update all of it’s dependencies
+    - Switch to listeners?
+- Version manager needs to be tested with dispose or listener removal
+- Modals?
+- Concurrency?
+- Reusing other services?
 
 ```es6
 class Foo {
