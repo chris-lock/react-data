@@ -1,6 +1,8 @@
 - initial fetch for insights
 - keyboard events
-- representers don't work well with collections
+- only exports
+-- Record, { Association, Collection, Iterable }
+-- Service, { WriteKey }
 
 ```es6
 class Foo {
