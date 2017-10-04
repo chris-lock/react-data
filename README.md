@@ -1,13 +1,18 @@
-- initial fetch for insights
-- keyboard events
+Todo
+
 - only exports
     - Record, { Association, Collection }
     - Service, { WriteKey }
-- data only returns iterables or frozen objects
 - iterable implements includes and slice
 - disposables don’t work with sibling records (1:1) switching since one record would have to update all of it’s dependencies
     - Switch to listeners?
 - Version manager needs to be tested with dispose or listener removal
+
+Needs
+
+- data only returns iterables or frozen objects
+- initial fetch for insights
+- keyboard events
 - Modals?
 - Concurrency?
 - Reusing other services?
@@ -51,27 +56,4 @@ class SubscriptionService {
 }
 
 export default new SubscriptionService
-
-class ClassA
-extends Record {
-  static associations: typeof Associations = Associations
-    .oneToOne({
-      local: ClassA,
-      localKey: 'b',
-      foreign: ClassB,
-      foreignKey: 'a',
-    })
-    .oneToMany({
-      local: ClassA,
-      localKey: 'c',
-      foreign: ClassC,
-      foreignKey: 'a',
-    })
-    .manyToMany({
-      local: ClassA,
-      localKey: 'd',
-      foreign: ClassD,
-      foreignKey: 'a',
-    });
-}
 ```
