@@ -3,7 +3,6 @@ Todo
 - only exports
     - Record, { Association, Collection }
     - Service, { WriteKey }
-- iterable implements includes and slice
 - disposables don’t work with sibling records (1:1) switching since one record would have to update all of it’s dependencies
     - Switch to listeners?
 - Version manager needs to be tested with dispose or listener removal

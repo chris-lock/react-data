@@ -1,9 +1,15 @@
 import Iterable from 'Iterable';
 
 describe('Iterable', () => {
-  const iternalItem1 = {};
-  const iternalItem2 = {};
-  const iternalItem3 = {};
+  const iternalItem1 = {
+    iternalItem1: true,
+  };
+  const iternalItem2 = {
+    iternalItem2: true,
+  };
+  const iternalItem3 = {
+    iternalItem3: true,
+  };
   const internalArray = [
     iternalItem1,
     iternalItem2,
@@ -18,7 +24,7 @@ describe('Iterable', () => {
     iterable = new Iterable(internalArray);
   });
 
-  const describeIterableMethod = (method, callCount, its) => {
+  const describeIterableMethod = (method, callCount, itMethods) => {
     describe(`#${method}`, () => {
       const description = (callCount == internalArray.length)
         ? 'calls every item'
@@ -59,7 +65,7 @@ describe('Iterable', () => {
         }
       });
 
-      its();
+      itMethods();
     });
   };
 
@@ -88,8 +94,43 @@ describe('Iterable', () => {
   });
 
   describeIterableMethod('some', 2, () => {
-    it('evaluates any item matches the condition', () => {
+    it('evaluates if any item matches the condition', () => {
       expect(result).toBe(true);
+    });
+  });
+
+  describe('#includes', () => {
+    it('evaluates if any item matches the item', () => {
+      expect(iterable.includes(iternalItem1)).toBe(true);
+      expect(iterable.includes({})).toBe(false);
+    });
+  });
+
+  describe('#slice', () => {
+    it('returns a portion of the internal array', () => {
+      expect(iterable.slice()).toEqual([
+        iternalItem1,
+        iternalItem2,
+        iternalItem3,
+      ]);
+      expect(iterable.slice(1)).toEqual([
+        iternalItem2,
+        iternalItem3,
+      ]);
+      expect(iterable.slice(-1)).toEqual([
+        iternalItem3,
+      ]);
+      expect(iterable.slice(-2)).toEqual([
+        iternalItem2,
+        iternalItem3,
+      ]);
+      expect(iterable.slice(1, 3)).toEqual([
+        iternalItem2,
+        iternalItem3,
+      ]);
+      expect(iterable.slice(1, -1)).toEqual([
+        iternalItem2,
+      ]);
     });
   });
 

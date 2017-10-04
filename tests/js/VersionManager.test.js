@@ -160,7 +160,7 @@ describe('VersionManager', () => {
       });
 
       describe('#clear', () => {
-        it('only clears all versions', () => {
+        it('clears all versions', () => {
           expect(versionManagerA.version()).toEqual(1);
           expect(versionManagerB.version()).toEqual(1);
           expect(versionManagerC.version()).toEqual(1);

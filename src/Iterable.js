@@ -32,8 +32,16 @@ export default class Iterable<Item> {
     return this._items.some(this._iterableMethod(method), thisArg);
   }
 
+  includes(item: Item): boolean {
+    return this._items.includes(item);
+  }
+
+  slice(begin?: number, end?: number): Array<Item> {
+    return this._items.slice(begin, end);
+  }
+
   all(): Array<Item> {
-    return this._items.slice(0);
+    return this.slice();
   }
 
   _iterableMethod<Return>(method: Iterable$Method<Item, Return>): Iterable$Method<Item, Return> {

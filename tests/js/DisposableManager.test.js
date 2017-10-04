@@ -26,6 +26,21 @@ describe('DisposableManager', () => {
     });
   });
 
+  describe('#removeDependency', () => {
+    beforeEach(() => {
+      disposableManager.addDependency(disposable1);
+      disposableManager.addDependency(disposable2);
+    });
+
+    it('removes the provided Disposable', () => {
+      expect(disposableManager._dependencies.length).toEqual(2);
+
+      disposableManager.removeDependency(disposable1);
+      expect(disposableManager._dependencies.length).toEqual(1);
+      expect(disposableManager._dependencies[0]).toBe(disposable2);
+    });
+  });
+
   describe('#prune', () => {
     let pruneSpy;
     let validDisposables = [];
