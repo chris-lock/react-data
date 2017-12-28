@@ -6,10 +6,6 @@
   "repository": "git@github.com:chris-lock/react-data.git",
   "author": "Chris Lock <lock.christopher@gmail.com>",
   "license": "MIT",
-  "engines": {
-    "node": "7.10.0",
-    "yarn": "0.23.4"
-  },
   "devDependencies": {
     "babel-cli": "6.24.1",
     "babel-jest": "20.0.0",
