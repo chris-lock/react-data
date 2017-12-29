@@ -1,34 +1,31 @@
 // @flow
 
-type Iterable$Method<Item, Return> = (
-  currentValue: Item,
-  index: number
-) => Return;
+type Method<Item, Return> = (item: Item, index: number) => Return;
 
-export default class Iterable<Item> {
+export default class ReadOnly<Item> {
   _items: Array<Item> = [];
 
   constructor(items: Array<Item>) {
     this._items = items;
   }
 
-  forEach(method: Iterable$Method<Item, void>, thisArg?: any): void {
+  forEach(method: Method<Item, void>, thisArg?: any): void {
     return this._items.forEach(this._iterableMethod(method), thisArg);
   }
 
-  map<Return>(method: Iterable$Method<Item, Return>, thisArg?: any): Array<Return> {
+  map<Return>(method: Method<Item, Return>, thisArg?: any): Array<Return> {
     return this._items.map(this._iterableMethod(method), thisArg);
   }
 
-  find(method: Iterable$Method<Item, boolean>, thisArg?: any): ?Item {
+  find(method: Method<Item, boolean>, thisArg?: any): ?Item {
     return this._items.find(this._iterableMethod(method), thisArg);
   }
 
-  every(method: Iterable$Method<Item, boolean>, thisArg?: any): boolean {
+  every(method: Method<Item, boolean>, thisArg?: any): boolean {
     return this._items.every(this._iterableMethod(method), thisArg);
   }
 
-  some(method: Iterable$Method<Item, boolean>, thisArg?: any): boolean {
+  some(method: Method<Item, boolean>, thisArg?: any): boolean {
     return this._items.some(this._iterableMethod(method), thisArg);
   }
 
@@ -44,7 +41,7 @@ export default class Iterable<Item> {
     return this.slice();
   }
 
-  _iterableMethod<Return>(method: Iterable$Method<Item, Return>): Iterable$Method<Item, Return> {
+  _iterableMethod<Return>(method: Method<Item, Return>): Method<Item, Return> {
     return (item: Item, index: number): Return => method(item, index);
   }
 }

@@ -26,6 +26,22 @@ Structure
 - Sorting recipes and searching recipes
 
 ```es6
+if (this.state.cache < this.cache.version) {
+  this.setState((prevState: State, props: Props): $Shape<State> => ({
+    cache: this.cache.read(),
+  }));
+}
+
+this.setState((prevState: State, props: Props): $Shape<State> => {
+  return (prevState.cache === this.cache.version)
+    ? {
+        cache: this.cache.read(),
+      }
+    : {};
+});
+```
+
+```es6
 class Foo {
   _run(key) {
     Collection.update(key)
