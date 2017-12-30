@@ -1,15 +1,15 @@
 [options]
 esproposal.class_instance_fields=enable
 esproposal.class_static_fields=enable
-module.system.node.resolve_dirname=src/
 module.system.node.resolve_dirname=node_modules
+module.system.node.resolve_dirname=src
 munge_underscores=true
 suppress_comment=\\(.\\|\n\\)*\\@flow.bug
 suppress_comment=\\(.\\|\n\\)*\\@flow.test
 unsafe.enable_getters_and_setters=true
 
 [libs]
-lib/
+libs/
 
 [include]
 .*/test/flow/*
