@@ -1,6 +1,8 @@
 // @flow
 
 import Writer from './Writer';
+import WriteOnlyIterable from 'helpers/Iterable/WriteOnly';
+import Collection from './Collection';
 
 import type {
   Record$Schema,
@@ -13,9 +15,11 @@ import type {
 
 export default class Table<Schema: Record$Schema>
 extends Writer {
-  _collections: Array<Record$Collection<Schema>> = [];
+  collections: WriteOnlyIterable<Collection<Schema>>
+    = new WriteOnlyIterable(this);
+  records: WriteOnlyIterable<Record$Child<Schema>>
+    = new WriteOnlyIterable(this._key);
   _key: WriteKey;
-  _records: Array<Record$Child<Schema>> = [];
   _recordClass: Record$Class<Schema>;
 
   constructor(recordClass: Record$Class<Schema>) {
@@ -32,29 +36,37 @@ extends Writer {
       : [];
   }
 
-  create(key: WriteKey, ...schemas: Array<Schema>) {
-    const records = schemas.map((schema: Schema): Record$Child<Schema> => {
-      new this._recordClass(this._key, schema)
-    });
+  create(
+    key: WriteKey,
+    ...schemas: Array<Schema>
+  ): Array<Record$Child<Schema>> {
+    const records = schemas.map((schema: Schema): Record$Child<Schema> =>
+        new this._recordClass(this._key, schema)
+      );
 
-    this._records.push(...records);
+    this.records.add(...records);
 
-    this._collections.forEach((collection: Record$Collection<Schema>): void => {
-      collection.onCreate(...records);
-    });
+    this.collections.all(this)
+      .forEach((collection: Collection<Schema>): void => {
+        collection.onCreate(key, ...records);
+      });
+
+    return records;
   }
 
-  onUpdate(...records: Array<Record$Child<Schema>>) {
-    this._collections.forEach((collection: Record$Collection<Schema>): void => {
-      collection.onUpdate(...records);
-    });
+  onUpdate(key: WriteKey, ...records: Array<Record$Child<Schema>>): void {
+    this.collections.all(this)
+      .forEach((collection: Collection<Schema>): void => {
+        collection.onUpdate(key, ...records);
+      });
   }
 
-  onDelete(...records: Array<Record$Child<Schema>>) {
-    // this._records.remove
+  onDestory(key: WriteKey, ...records: Array<Record$Child<Schema>>): void {
+    this.records.remove(...records);
 
-    this._collections.forEach((collection: Record$Collection<Schema>): void => {
-      collection.onDelete(...records);
-    });
+    this.collections.all(this)
+      .forEach((collection: Collection<Schema>): void => {
+        collection.onDestory(key, ...records);
+      });
   }
 }

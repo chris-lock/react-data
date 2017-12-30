@@ -10,16 +10,18 @@ export default class WriteOnly<Item> {
     this._owner = owner;
   }
 
-  add(item: Item): void {
-    this._items.push(item);
+  add(...items: Array<Item>): void {
+    this._items.push(...items);
   }
 
-  remove(item: Item): void {
-    const index: number = this._items.indexOf(item);
+  remove(...items: Array<Item>): void {
+    items.forEach((item: Item): void => {
+      const index: number = this._items.indexOf(item);
 
-    if (index > -1) {
-      this._items.splice(index, 1);
-    }
+      if (index > -1) {
+        this._items.splice(index, 1);
+      }
+    });
   }
 
   all(owner: any): Array<Item> {

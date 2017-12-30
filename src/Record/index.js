@@ -1,10 +1,14 @@
 // @flow
 
 import Table from './Table';
+import Collection from './Collection';
 
 import type {
   WriteKey,
 } from './Writer';
+import type {
+  Record$Query,
+} from './Collection';
 
 export type Record$Child<Schema> = $Subtype<Record<Schema>>;
 export type Record$Class<Schema> = Class<Record$Child<Schema>>;
@@ -21,19 +25,34 @@ export default class Record<Schema: Record$Schema> {
     return this._table = new Table((this: Record$Class<Schema>));
   }
 
-  static first(query: Record$Query<Schema>): void {
+  static asCollection(): Record$Class<Schema> {
+    this._getTable();
+
+    return this;
+  }
+
+  static first(query: Record$Query<Schema>): Record$Child<Schema> {
     return new Collection(this.table).first(query);
   }
 
-  static where(query: Collection$Query<Schema>): Collection<Schema> {
+  static where(query: Record$Query<Schema>): Collection<Schema> {
     return new Collection(this.table).where(query);
   }
 
-  static create(key: WriteKey, ...schemas: Array<Schema>): void {
-    this.table.create(key, ...schemas);
+  static create(
+    key: WriteKey,
+    ...schemas: Array<Schema>
+  ): Array<Record$Child<Schema>> {
+    return this.table.create(key, ...schemas);
   }
 
-  // update(data) {
+  _data: Schema;
+
+  data(key: WriteKey): Schema {
+    return this._data;
+  }
+
+  // update(key, data) {
   //   if (updated) {
   //     this.constructor.table.onUpdate(this);
   //   }

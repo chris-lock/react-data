@@ -16,5 +16,7 @@ libs/
 
 [ignore]
 .*/node_modules/*
-.*/test/js/*
+.*/tests/js/*
 .*/tmp/*
+.*/_src/*
+.*/_test/*
