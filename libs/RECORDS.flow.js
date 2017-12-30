@@ -1,3 +1,5 @@
 // @flow
 
-declare type RECORDS = Object;
+declare type RECORDS = {
+  [_:string]: Record$Schema,
+};

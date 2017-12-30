@@ -13,9 +13,9 @@ import type {
 
 export default class Table<Schema: Record$Schema>
 extends Writer {
-  records: Array<Record$Child<Schema>> = [];
   _collections: Array<Record$Collection<Schema>> = [];
   _key: WriteKey;
+  _records: Array<Record$Child<Schema>> = [];
   _recordClass: Record$Class<Schema>;
 
   constructor(recordClass: Record$Class<Schema>) {
@@ -28,16 +28,16 @@ extends Writer {
 
   _bootstrappedData(): Array<Schema> {
     return (typeof RECORDS === 'object' && RECORDS[this._recordClass.name])
-      ? RECORDS[this._recordClass.name].records
+      ? RECORDS[this._recordClass.name]
       : [];
   }
 
   create(key: WriteKey, ...schemas: Array<Schema>) {
-    const records = schemas.map((schema: Schema): Record$Child<Schema> =>
+    const records = schemas.map((schema: Schema): Record$Child<Schema> => {
       new this._recordClass(this._key, schema)
-    );
+    });
 
-    this.records.push(...records);
+    this._records.push(...records);
 
     this._collections.forEach((collection: Record$Collection<Schema>): void => {
       collection.onCreate(...records);
@@ -51,6 +51,8 @@ extends Writer {
   }
 
   onDelete(...records: Array<Record$Child<Schema>>) {
+    // this._records.remove
+
     this._collections.forEach((collection: Record$Collection<Schema>): void => {
       collection.onDelete(...records);
     });

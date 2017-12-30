@@ -18,10 +18,10 @@ export default class Record<Schema: Record$Schema> {
   }
 
   static _getTable(): Table<Schema> {
-    return this._table = new Table(this);
+    return this._table = new Table((this: Record$Class<Schema>));
   }
 
-  static first(query: Collection$Query<Schema>): void {
+  static first(query: Record$Query<Schema>): void {
     return new Collection(this.table).first(query);
   }
 
@@ -33,38 +33,44 @@ export default class Record<Schema: Record$Schema> {
     this.table.create(key, ...schemas);
   }
 
-  update(data) {
-    if (updated) {
-      this.constructor.table.onUpdate(this);
-    }
-  }
+  // update(data) {
+  //   if (updated) {
+  //     this.constructor.table.onUpdate(this);
+  //   }
+  // }
 }
 
-class Collection {
-  onCreate(writeKey, record) {
-    this._onChange(record, 'create')
-  }
+// class Collection {
+//   onCreate(writeKey, record) {
+//     this._onChange(record, 'create')
+//   }
 
-  onUpdate(writeKey, record) {
-    this._onChange(record, 'update')
-  }
+//   onUpdate(writeKey, record) {
+//     this._onChange(record, 'update')
+//   }
 
-  onDelete(writeKey, record) {
-    this._onChange(record, 'delete')
-  }
+//   onDelete(writeKey, record) {
+//     this._onChange(record, 'delete')
+//   }
 
-  _onChange(record, event) {
-    matchesQuery !(event === 'delete' || !this.query.matches);
-    inCollection = !(event === 'create' || !this.inCollection);
+//   _onChange(record, event) {
+//     matchesQuery !(event === 'delete' || !this.query.matches);
+//     inCollection = !(event === 'create' || !this.inCollection);
 
-    if (matchesQuery && !inCollection) {
-      this.records.push(record);
-      this.cache.break();
-      this.cache.add(record.cache);
-    } else if (!matchesQuery && inCollection) {
-      this.records.remove(record);
-      this.cache.remove(record.cache);
-      this.cache.break();
-    }
-  }
-}
+//     if (matchesQuery && !inCollection) {
+//       this.records.push(record);
+//       this.cache.break();
+//       this.cache.add(record.cache);
+//     } else if (!matchesQuery && inCollection) {
+//       this.records.remove(record);
+//       this.cache.remove(record.cache);
+//       this.cache.break();
+//     }
+
+
+//     // or since queries have caches instead of collections
+
+//     this.records.push(record);
+//     this._query.cache.break();
+//   }
+// }
