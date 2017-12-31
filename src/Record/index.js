@@ -2,6 +2,7 @@
 
 import Table from './Table';
 import Collection from './Collection';
+import Helpers from 'utilities/Helpers';
 
 import type {
   WriteKey,
@@ -52,44 +53,13 @@ export default class Record<Schema: Record$Schema> {
     return this._data;
   }
 
-  // update(key, data) {
-  //   if (updated) {
-  //     this.constructor.table.onUpdate(this);
-  //   }
-  // }
+  update(key: WriteKey, data: $Shape<Schema>) {
+    if (Helpers.objects.update(this._data, data)) {
+      this.constructor.table.onUpdate(key, (this: Record$Child<Schema>));
+    }
+  }
+
+  destroy(key: WriteKey) {
+    this.constructor.table.onDestory(key, (this: Record$Child<Schema>));
+  }
 }
-
-// class Collection {
-//   onCreate(writeKey, record) {
-//     this._onChange(record, 'create')
-//   }
-
-//   onUpdate(writeKey, record) {
-//     this._onChange(record, 'update')
-//   }
-
-//   onDelete(writeKey, record) {
-//     this._onChange(record, 'delete')
-//   }
-
-//   _onChange(record, event) {
-//     matchesQuery !(event === 'delete' || !this.query.matches);
-//     inCollection = !(event === 'create' || !this.inCollection);
-
-//     if (matchesQuery && !inCollection) {
-//       this.records.push(record);
-//       this.cache.break();
-//       this.cache.add(record.cache);
-//     } else if (!matchesQuery && inCollection) {
-//       this.records.remove(record);
-//       this.cache.remove(record.cache);
-//       this.cache.break();
-//     }
-
-
-//     // or since queries have caches instead of collections
-
-//     this.records.push(record);
-//     this._query.cache.break();
-//   }
-// }

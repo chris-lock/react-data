@@ -1,6 +1,7 @@
 // @flow
 
 import Base from './Base';
+import Helpers from 'utilities/Helpers';
 
 import type {
   Record$Schema,
@@ -46,14 +47,7 @@ extends Base<
     return !!(
       prev
       && current
-      && !this._matches(prev, current)
-    );
-  }
-
-  _matches<Obj: {}>(a: Obj, b: Obj): boolean {
-    return (
-      Object.keys(a) === Object.keys(b)
-      && this.fragmentMatches(a, b)
+      && !Helpers.objects.equal(prev, current)
     );
   }
 
@@ -61,7 +55,7 @@ extends Base<
     if (props && state) {
       let computed: $Shape<Schema> = this.query(props, state);
 
-      if (!this._matches(this._computed, computed)) {
+      if (!Helpers.objects.equal(this._computed, computed)) {
         this._computed = computed;
 
         return true;
@@ -72,6 +66,6 @@ extends Base<
   }
 
   matches(schema: Schema): boolean {
-    return this.fragmentMatches(this._computed, schema);
+    return Helpers.objects.fragmentMatches(schema, this._computed);
   }
 }

@@ -26,15 +26,6 @@ export default class Base<
     return false;
   }
 
-  fragmentMatches<Whole: {}>(fragment: $Shape<Whole>, whole: Whole): boolean {
-    const keys: Array<string> = Object.keys(fragment);
-
-    return (
-      !!keys.length
-      && keys.every((key: string): boolean => whole[key] === fragment[key])
-    );
-  }
-
   updatePropsAndState(props: ?Props, state: ?State): void {
     this.props = props || this.props;
     this.state = state || this.state;

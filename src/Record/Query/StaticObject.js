@@ -1,6 +1,7 @@
 // @flow
 
 import Base from './Base';
+import Helpers from 'utilities/Helpers';
 
 import type {
   Record$Schema,
@@ -20,6 +21,6 @@ extends Base<
   Query$StaticObject<Schema>
 > {
   matches(schema: Schema): boolean {
-    return this.fragmentMatches(this.query, schema);
+    return Helpers.objects.fragmentMatches(schema, this.query);
   }
 }

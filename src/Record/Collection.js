@@ -1,10 +1,10 @@
 // @flow
 
 import Writer from './Writer';
-import Cache from 'helpers/Cache';
+import Cache from 'utilities/Cache';
 import Table from './Table';
 import Query from './Query';
-import WriteOnlyIterable from 'helpers/Iterable/WriteOnly';
+import WriteOnlyIterable from 'utilities/Iterable/WriteOnly';
 
 import type {
   WriteKey,
@@ -21,7 +21,7 @@ extends Writer {
   _cache: ?Cache;
   _key: WriteKey;
   _queries: Array<Query<Schema>>;
-  _records: WriteOnlyIterable<Record$Child<Schema>>
+  _records: WriteOnlyIterable<Collection<Schema>, Record$Child<Schema>>
     = new WriteOnlyIterable(this);
   _table: Table<Schema>;
 
@@ -83,20 +83,19 @@ extends Writer {
   }
 
   _contains(
-    doesContain: boolean,
+    select: boolean,
     records: Array<Record$Child<Schema>>
   ): Array<Record$Child<Schema>> {
     return records.filter((record: Record$Child<Schema>): boolean =>
-      (this._records.all(this).indexOf(record) >= 0) == doesContain
+      (this._records.all(this).indexOf(record) >= 0) === select
     );
   }
 
   onDestory(key: WriteKey, ...records: Array<Record$Child<Schema>>): void {
-    const existingRecords: Array<Record$Child<Schema>>
-      = this._contains(true, records);
+    const existing: Array<Record$Child<Schema>> = this._contains(true, records);
 
-    if (existingRecords) {
-      this._records.remove(...existingRecords);
+    if (existing) {
+      this._records.remove(...existing);
       this._cacheClear();
     }
   }

@@ -2,11 +2,11 @@
 
 type Listener = () => void;
 
-export default class WriteOnly<Item> {
+export default class WriteOnly<Owner: any, Item> {
   _items: Array<Item> = [];
-  _owner: any;
+  _owner: Owner;
 
-  constructor(owner: any) {
+  constructor(owner: Owner) {
     this._owner = owner;
   }
 
@@ -24,7 +24,7 @@ export default class WriteOnly<Item> {
     });
   }
 
-  all(owner: any): Array<Item> {
+  all(owner: Owner): Array<Item> {
     return (this._owner === owner)
       ? this._items
       : [];

@@ -5,8 +5,8 @@ import WriteOnlyIterable from './Iterable/WriteOnly';
 type Listener = () => void;
 
 export default class Cache {
-  listeners: WriteOnlyIterable<Listener> = new WriteOnlyIterable(this);
-  network: WriteOnlyIterable<Cache> = new WriteOnlyIterable(this);
+  listeners: WriteOnlyIterable<Cache, Listener> = new WriteOnlyIterable(this);
+  network: WriteOnlyIterable<Cache, Cache> = new WriteOnlyIterable(this);
   version: number = 0;
   _version: number = 1;
 
