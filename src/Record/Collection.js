@@ -1,24 +1,27 @@
 // @flow
 
-import Writer from './Writer';
+import Writer from 'Writer';
 import Cache from 'utilities/Cache';
 import Table from './Table';
 import Query from './Query';
+import ReadOnlyIterable from 'utilities/Iterable/ReadOnly';
 import WriteOnlyIterable from 'utilities/Iterable/WriteOnly';
 
 import type {
   WriteKey,
-} from './Writer';
+} from 'Writer';
 import type {
   Record$Schema,
   Record$Child,
 } from './index';
-
-export type Record$Query<Schema> = {};
+import type {
+  Record$Query,
+} from './Query';
 
 export default class Collection<Schema: Record$Schema>
 extends Writer {
   _cache: ?Cache;
+  _readOnly: ReadOnlyIterable<Collection<Schema>, Record$Child<Schema>>
   _key: WriteKey;
   _queries: Array<Query<Schema>>;
   _records: WriteOnlyIterable<Collection<Schema>, Record$Child<Schema>>
@@ -44,9 +47,23 @@ extends Writer {
     return this._cache;
   }
 
-  first(query: Record$Query<Schema>): any {}
+  first(query: Record$Query<Schema>): Record$Child<Schema> {
+    return this._table.recordClass.asProxy(
+      this._key,
+      this.where(query)
+    );
+  }
 
-  where(query: Record$Query<Schema>): any {}
+  where(query: Record$Query<Schema>): Collection<Schema> {
+    this._queries.push(new Query(query));
+
+    this.onCreate(
+      this._key,
+      ...this._table.records.all(this._key)
+    );
+
+    return this;
+  }
 
   onCreate(key: WriteKey, ...records: Array<Record$Child<Schema>>): void {
     this._addIfAny(this._matchesQueries(key, records));
@@ -83,11 +100,11 @@ extends Writer {
   }
 
   _contains(
-    select: boolean,
+    selectNotReject: boolean,
     records: Array<Record$Child<Schema>>
   ): Array<Record$Child<Schema>> {
     return records.filter((record: Record$Child<Schema>): boolean =>
-      (this._records.all(this).indexOf(record) >= 0) === select
+      (this._records.all(this).indexOf(record) >= 0) === selectNotReject
     );
   }
 
@@ -103,4 +120,20 @@ extends Writer {
   destory(): void {
     this._table.collections.remove((this: any));
   }
+
+  firstRecord(): ?Record$Child<Schema> {
+    return this._records.all(this)[0];
+  }
+
+  forEach = this._iterable.forEach;
+
+  map = this._iterable.map;
+
+  find = this._iterable.find;
+
+  every = this._iterable.every;
+
+  some = this._iterable.some;
+
+  all = this._iterable.all;
 }

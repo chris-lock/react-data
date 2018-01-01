@@ -1,6 +1,6 @@
 // @flow
 
-import Writer from './Writer';
+import Writer from 'Writer';
 import WriteOnlyIterable from 'utilities/Iterable/WriteOnly';
 import Collection from './Collection';
 
@@ -11,27 +11,27 @@ import type {
 } from './index';
 import type {
   WriteKey,
-} from './Writer';
+} from 'Writer';
 
 export default class Table<Schema: Record$Schema>
 extends Writer {
   collections: WriteOnlyIterable<Table<Schema>, Collection<Schema>>
     = new WriteOnlyIterable(this);
+  recordClass: Record$Class<Schema>;
   records: WriteOnlyIterable<WriteKey, Record$Child<Schema>>
     = new WriteOnlyIterable(this._key);
   _key: WriteKey;
-  _recordClass: Record$Class<Schema>;
 
   constructor(recordClass: Record$Class<Schema>) {
     super();
 
-    this._recordClass = recordClass;
+    this.recordClass = recordClass;
     this.create(this._key, ...this._bootstrappedData());
   }
 
   _bootstrappedData(): Array<Schema> {
-    return (typeof RECORDS === 'object' && RECORDS[this._recordClass.name])
-      ? RECORDS[this._recordClass.name]
+    return (typeof RECORDS === 'object' && RECORDS[this.recordClass.name])
+      ? RECORDS[this.recordClass.name]
       : [];
   }
 
@@ -40,7 +40,7 @@ extends Writer {
     ...dataSets: Array<Schema>
   ): Array<Record$Child<Schema>> {
     const records = dataSets.map((data: Schema): Record$Child<Schema> =>
-        new this._recordClass(this._key, data)
+        new this.recordClass(this._key, data)
       );
 
     this.records.add(...records);
