@@ -43,9 +43,9 @@ export default class Record<Schema: Record$Schema> {
 
   static create(
     key: WriteKey,
-    ...schemas: Array<Schema>
+    ...dataset: Array<Schema>
   ): Array<Record$Child<Schema>> {
-    return this.table().create(key, ...schemas);
+    return this.table().create(key, ...dataset);
   }
 
   static asProxy(
@@ -55,6 +55,7 @@ export default class Record<Schema: Record$Schema> {
     return new this(key, ({}: any)).proxy(key, collection);
   }
 
+  _cache: ?Cache;
   _collection: ?Collection<Schema>;
   _data: Schema;
   _proxyRecord: ?Record$Child<Schema>;
@@ -70,13 +71,21 @@ export default class Record<Schema: Record$Schema> {
   }
 
   update(key: WriteKey, data: $Shape<Schema>): void {
-    if (this._update(key, data)) {
+    if (this._updateIfChanged(key, data)) {
+      this._breakCache();
+
       this.constructor.table.onUpdate(key, this._record());
     }
   }
 
-  _update(key: WriteKey, data: $Shape<Schema>): boolean {
+  _updateIfChanged(key: WriteKey, data: $Shape<Schema>): boolean {
     return Helpers.objects.update(this.data(key), data);
+  }
+
+  _breakCache(): void {
+    if (this._cache) {
+      this._cache.break();
+    }
   }
 
   _record(): Record$Child<Schema> {
@@ -109,16 +118,16 @@ export default class Record<Schema: Record$Schema> {
     if (shouldCallOnUpdate) {
       this.update(key, this.data(key));
     } else {
-      this._update(key, this.data(key));
+      this._updateIfChanged(key, this.data(key));
     }
   }
 
   cache(): Cache {
-    // Should only clear if something changed so should have it's own cache
-    // which means it doesn't need a reference to collection
-    return (this._collection)
-      ? this._collection.cache()
-      : new Cache;
+    if (!this._cache) {
+      this._cache = new Cache;
+    }
+
+    return this._cache;
   }
 
   exists(): boolean {

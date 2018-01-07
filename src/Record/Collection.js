@@ -21,9 +21,9 @@ import type {
 export default class Collection<Schema: Record$Schema>
 extends Writer {
   _cache: ?Cache;
-  _readOnly: ReadOnlyIterable<Collection<Schema>, Record$Child<Schema>>
   _key: WriteKey;
   _queries: Array<Query<Schema>>;
+  _readOnly: ReadOnlyIterable<Record$Child<Schema>>;
   _records: WriteOnlyIterable<Collection<Schema>, Record$Child<Schema>>
     = new WriteOnlyIterable(this);
   _table: Table<Schema>;
@@ -34,6 +34,7 @@ extends Writer {
   ) {
     super();
 
+    this._readOnly = new ReadOnlyIterable(this._records.all(this));
     this._queries = queries;
     this._table = table;
   }
@@ -125,15 +126,19 @@ extends Writer {
     return this._records.all(this)[0];
   }
 
-  forEach = this._iterable.forEach;
+  forEach = this._readOnly.forEach;
 
-  map = this._iterable.map;
+  map = this._readOnly.map;
 
-  find = this._iterable.find;
+  find = this._readOnly.find;
 
-  every = this._iterable.every;
+  every = this._readOnly.every;
 
-  some = this._iterable.some;
+  some = this._readOnly.some;
 
-  all = this._iterable.all;
+  includes = this._readOnly.includes;
+
+  slice = this._readOnly.slice;
+
+  all = this._readOnly.all;
 }
