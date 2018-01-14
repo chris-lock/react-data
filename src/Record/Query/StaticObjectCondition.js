@@ -1,24 +1,24 @@
 // @flow
 
-import Base from './Base';
+import Condition from './Condition';
 import Helpers from 'utilities/Helpers';
 
 import type {
   Record$Schema,
 } from '../index.js';
 
-export type Query$StaticObject<Schema> = $Shape<Schema>;
+export type Condition$StaticObject<Schema> = $Shape<Schema>;
 
-export default class StaticObject<
+export default class StaticObjectCondition<
   Schema: Record$Schema,
   Props: {},
   State: {}
 >
-extends Base<
+extends Condition<
   Schema,
   Props,
   State,
-  Query$StaticObject<Schema>
+  Condition$StaticObject<Schema>
 > {
   matches(schema: Schema): boolean {
     return Helpers.objects.fragmentMatches(schema, this.query);

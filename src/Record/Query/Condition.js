@@ -4,7 +4,9 @@ import type {
   Record$Schema,
 } from '../index.js';
 
-export default class Base<
+export type Condition$Child<Schema> = $Subtype<Condition<Schema, *, *, *>>;
+
+export default class Condition<
   Schema: Record$Schema,
   Props: {},
   State: {},

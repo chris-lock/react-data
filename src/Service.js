@@ -18,5 +18,5 @@ extends Writer {
     this._run(this._key, payload);
   }
 
-  _run(key: WriteKey, payload: Payload) {}
+  _run(key: WriteKey, payload: Payload): void {}
 }

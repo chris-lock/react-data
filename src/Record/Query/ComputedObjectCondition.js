@@ -1,27 +1,27 @@
 // @flow
 
-import Base from './Base';
+import Condition from './Condition';
 import Helpers from 'utilities/Helpers';
 
 import type {
   Record$Schema,
 } from '../index.js';
 
-export type Query$ComputedObject<Props, State, Schema> = (
+export type Condition$ComputedObject<Props, State, Schema> = (
   props: Props,
   state: State
 ) => $Shape<Schema>;
 
-export default class ComputedObject<
+export default class ComputedObjectCondition<
   Schema: Record$Schema,
   Props: {},
   State: {}
 >
-extends Base<
+extends Condition<
   Schema,
   Props,
   State,
-  Query$ComputedObject<Props, State, Schema>
+  Condition$ComputedObject<Props, State, Schema>
 > {
   _computed: $Shape<Schema> = {};
 

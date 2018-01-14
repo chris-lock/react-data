@@ -1,54 +1,90 @@
 // @flow
 
-import StaticObject from './StaticObject';
-import ComputedObject from './ComputedObject';
-import FilterMethod from './FilterMethod';
+import Listeners from 'utilities/Listeners';
+import StaticObjectCondition from './StaticObjectCondition';
+import ComputedObjectCondition from './ComputedObjectCondition';
+import FilterMethodCondition from './FilterMethodCondition';
 
 import type {
-  Query$StaticObject,
-} from './StaticObject';
+  Condition$StaticObject,
+} from './StaticObjectCondition';
 import type {
-  Query$ComputedObject,
-} from './ComputedObject';
+  Condition$ComputedObject,
+} from './ComputedObjectCondition';
 import type {
-  Query$FilterMethod,
-} from './FilterMethod';
+  Condition$FilterMethod,
+} from './FilterMethodCondition';
 import type {
   Record$Schema,
+  Record$Child,
 } from '../index.js';
-import type Base from './Base';
+import type {
+  Condition$Child
+} from './Condition';
+import type {
+  WriteKey,
+} from 'Writer';
 
-export type Record$Query<Schema> = (
-  Query$StaticObject<Schema>
-  |Query$ComputedObject<*, *, Schema>
-  |Query$FilterMethod<*, *, Schema>
+export type Record$Query$Condition<Schema> = (
+  Condition$StaticObject<Schema>
+  |Condition$ComputedObject<*, *, Schema>
+  |Condition$FilterMethod<*, *, Schema>
 );
 
-export default class QueryProxy<Schema: Record$Schema> {
-  _query: $Subtype<Base<Schema, *, *, *>>;
+export default class Query<Schema: Record$Schema> {
+  listeners: Listeners<Query<*>> = new Listeners(this);
+  _conditions: Array<Condition$Child<Schema>> = [];
 
-  constructor(query: Record$Query<Schema>) {
-    if (query instanceof Function) {
-      if (query.length === 2) {
-        this._query = new ComputedObject(query);
+  condition(condition: Record$Query$Condition<Schema>): void {
+    if (condition instanceof Function) {
+      if (condition.length === 2) {
+        this._conditions.push(
+          new ComputedObjectCondition(condition)
+        );
       } else {
-        this._query = new FilterMethod(query);
+        this._conditions.push(
+          new FilterMethodCondition(condition)
+        );
       }
-    } else if (query instanceof Object) {
-      this._query = new StaticObject(query);
-    } else {
-      this._query = new StaticObject({});
+    } else if (condition instanceof Object) {
+      this._conditions.push(
+        new StaticObjectCondition(condition)
+      );
     }
   }
 
-  changed<
+  update<
+    Props: {},
+    State: {}
+  >(props: ?Props, state: ?State): void {
+    if (this._changed(props, state)) {
+      this.listeners.call(this);
+    }
+  }
+
+  _changed<
     Props: {},
     State: {}
   >(props: ?Props, state: ?State): boolean {
-    return this._query.changed(props, state);
+    return this._conditions
+      .some((condition: Condition$Child<Schema>): boolean =>
+        condition.changed(props, state)
+      );
   }
 
-  matches(schema: Schema): boolean {
-    return this._query.matches(schema);
+  filter(
+    key: WriteKey,
+    records: Array<Record$Child<Schema>>
+  ): Array<Record$Child<Schema>> {
+    return records.filter((record: Record$Child<Schema>): boolean =>
+      this._matchesEveryCondition(record.data(key))
+    );
+  }
+
+  _matchesEveryCondition(data: Schema): boolean {
+    return this._conditions
+      .every((condition: Condition$Child<Schema>): boolean =>
+        condition.matches(data)
+      );
   }
 }

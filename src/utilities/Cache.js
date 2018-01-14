@@ -1,11 +1,12 @@
 // @flow
 
+import Listeners from './Listeners';
 import WriteOnlyIterable from './Iterable/WriteOnly';
 
 type Listener = () => void;
 
 export default class Cache {
-  listeners: WriteOnlyIterable<Cache, Listener> = new WriteOnlyIterable(this);
+  listeners: Listeners<Cache> = new Listeners(this);
   network: WriteOnlyIterable<Cache, Cache> = new WriteOnlyIterable(this);
   version: number = 0;
   _version: number = 1;
@@ -26,10 +27,10 @@ export default class Cache {
     if (!this._isBroken()) {
       this._version++;
 
-      this.network.all(this)
+      this.network
+        .all(this)
         .forEach((node: Cache): void => node.break());
-      this.listeners.all(this)
-        .forEach((listener: Listener): void => listener());
+      this.listeners.call(this);
     }
   }
 }

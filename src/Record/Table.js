@@ -39,7 +39,8 @@ extends Writer {
     key: WriteKey,
     ...dataSets: Array<Schema>
   ): Array<Record$Child<Schema>> {
-    const records = dataSets.map((data: Schema): Record$Child<Schema> =>
+    const records: Array<Record$Child<Schema>> = dataSets
+      .map((data: Schema): Record$Child<Schema> =>
         new this.recordClass(this._key, data)
       );
 

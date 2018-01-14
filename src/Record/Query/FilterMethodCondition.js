@@ -1,27 +1,27 @@
 // @flow
 
-import Base from './Base';
+import Condition from './Condition';
 
 import type {
   Record$Schema,
 } from '../index.js';
 
-export type Query$FilterMethod<Props, State, Schema> = (
+export type Condition$FilterMethod<Props, State, Schema> = (
   props: Props,
   state: State,
   schema: Schema
 ) => boolean;
 
-export default class FilterMethod<
+export default class FilterMethodCondition<
   Schema: Record$Schema,
   Props: {},
   State: {}
 >
-extends Base<
+extends Condition<
   Schema,
   Props,
   State,
-  Query$FilterMethod<Props, State, Schema>
+  Condition$FilterMethod<Props, State, Schema>
 > {
   props: ?Props;
   state: ?State;

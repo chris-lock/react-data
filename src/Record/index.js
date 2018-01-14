@@ -4,12 +4,13 @@ import Table from './Table';
 import Collection from './Collection';
 import Helpers from 'utilities/Helpers';
 import Cache from 'utilities/Cache';
+import Query from './Query';
 
 import type {
   WriteKey,
 } from 'Writer';
 import type {
-  Record$Query,
+  Record$Query$Condition,
 } from './Query';
 
 export type Record$Child<Schema> = $Subtype<Record<Schema>>;
@@ -33,12 +34,12 @@ export default class Record<Schema: Record$Schema> {
     return this;
   }
 
-  static first(query: Record$Query<Schema>): Record$Child<Schema> {
-    return new Collection(this.table()).first(query);
+  static first(condition: Record$Query$Condition<Schema>): Record$Child<Schema> {
+    return new Collection(this.table()).first(condition);
   }
 
-  static where(query: Record$Query<Schema>): Collection<Schema> {
-    return new Collection(this.table()).where(query);
+  static where(condition: Record$Query$Condition<Schema>): Collection<Schema> {
+    return new Collection(this.table()).where(condition);
   }
 
   static create(
@@ -71,14 +72,18 @@ export default class Record<Schema: Record$Schema> {
   }
 
   update(key: WriteKey, data: $Shape<Schema>): void {
-    if (this._updateIfChanged(key, data)) {
+    this._updateAndCallOnUpate(key, data);
+  }
+
+  _updateAndCallOnUpate(key: WriteKey, data: $Shape<Schema>): void {
+    if (this._update(key, data)) {
       this._breakCache();
 
       this.constructor.table.onUpdate(key, this._record());
     }
   }
 
-  _updateIfChanged(key: WriteKey, data: $Shape<Schema>): boolean {
+  _update(key: WriteKey, data: $Shape<Schema>): boolean {
     return Helpers.objects.update(this.data(key), data);
   }
 
@@ -113,21 +118,31 @@ export default class Record<Schema: Record$Schema> {
     collection: Collection<Schema>,
     shouldCallOnUpdate: boolean = true
   ): void {
-    this._proxyRecord = collection.firstRecord();
+    this._proxyRecord = collection.all()[0];
 
     if (shouldCallOnUpdate) {
-      this.update(key, this.data(key));
+      this._updateAndCallOnUpate(key, this.data(key));
     } else {
-      this._updateIfChanged(key, this.data(key));
+      this._update(key, this.data(key));
     }
   }
 
   cache(): Cache {
     if (!this._cache) {
       this._cache = new Cache;
+
+      if (this._collection) {
+        this._collection.cache();
+      }
     }
 
     return this._cache;
+  }
+
+  query(): Query<Schema> {
+    return (this._collection)
+      ? this._collection.query()
+      : new Query;
   }
 
   exists(): boolean {
