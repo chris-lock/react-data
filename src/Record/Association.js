@@ -1,12 +1,12 @@
 // @flow
 
-import Writer from './Writer';
+import Writer from 'Writer';
 
 import type {
   Record$Schema,
   Record$Class,
   Record$Child,
-} from './Record';
+} from './index';
 import Collection from './Collection';
 import type {
   WriteKey,
@@ -34,6 +34,14 @@ export default class Association<
   Schema: Record$Schema
 >
 extends Writer {
+  _reciprocating: boolean = false;
+
+  reciprocate(): Association<Schema> {
+    this._reciprocating = true;
+
+    return this;
+  }
+
   oneToOne<
     Local,
     Local$Key: Data$Key<Local>,
@@ -51,6 +59,14 @@ extends Writer {
     ],
   }): Association<Schema> {
     return this;
+  }
+
+  _ifNotReciprocating(method: () => void): void {
+    if (!this._reciprocating) {
+      method();
+    }
+
+    this._reciprocating = false;
   }
 
   oneToMany<
@@ -107,6 +123,21 @@ extends Writer {
       Foreign$Key,
     ],
   }): Association<Schema> {
+    this._ifNotReciprocating((): void => {
+      const toClass: HasMany<Foreign, Foreign$Key, Local> = manyToMany.to[0];
+
+      toClass.association = toClass.association.reciprocate().manyToMany({
+        to: manyToMany.from,
+        from: manyToMany.to,
+      });
+    });
+
+
+
     return this;
+  }
+
+  create(record: Record$Child<*>): void {
+
   }
 }
