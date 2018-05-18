@@ -123,16 +123,22 @@ extends Writer {
       Foreign$Key,
     ],
   }): Association<Schema> {
-    this._ifNotReciprocating((): void => {
-      const toClass: HasMany<Foreign, Foreign$Key, Local> = manyToMany.to[0];
+    const toClass: HasMany<Foreign, Foreign$Key, Local> = manyToMany.to[0];
 
+    this._ifNotReciprocating((): void => {
       toClass.association = toClass.association.reciprocate().manyToMany({
         to: manyToMany.from,
         from: manyToMany.to,
       });
     });
 
-
+    manyToMany.from[0].table.records().forEach((record) => {
+      record.associate(
+        toClass.where({
+          [manyToMany.to[1]]: record,
+        })
+      );
+    });
 
     return this;
   }

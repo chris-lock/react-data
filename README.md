@@ -3,6 +3,8 @@ Todo
 - only exports
     - Record, { Association, Collection }
     - Service, { WriteKey }
+- when switch the record at a oneTonOne, you need to update the queries of both the old and new record.
+  - A <-> B
 - disposables don’t work with sibling records (1:1) switching since one record would have to update all of it’s dependencies
     - Switch to listeners?
 - Version manager needs to be tested with dispose or listener removal
